@@ -1,0 +1,6 @@
+query GetOneTrack($trackId: String) {
+  getOneTrack(input: { trackId: $trackId }) {
+    _id
+    name
+  }
+}

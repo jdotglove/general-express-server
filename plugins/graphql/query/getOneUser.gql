@@ -1,0 +1,6 @@
+query GetOneUser($userId: String) {
+  getOneUser(input: { userId: $userId }) {
+    _id
+    displayName
+  }
+}

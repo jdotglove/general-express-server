@@ -1,0 +1,9 @@
+mutation UpdateOneAlbum($albumId: String!, $albumPayload: AlbumPayloadInput!) {
+  updateOneAlbum(input: {
+    albumId: $albumId
+    albumPayload: $albumPayload
+  }) {
+    _id
+    name
+  }
+}

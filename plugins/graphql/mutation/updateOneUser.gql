@@ -1,0 +1,9 @@
+mutation UpdateOneUser($userId: String!, $userPayload: UserPayloadInput!) {
+  addOneUser(input: {
+    userId: $userId
+    userPayload: $userPayload
+  }) {
+    _id
+    displayName
+  }
+}
