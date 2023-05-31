@@ -1,0 +1,6 @@
+query GetOneAlbum($albumId: String) {
+  getOneAlbum(input: { albumId: $albumId }) {
+    _id
+    name
+  }
+}

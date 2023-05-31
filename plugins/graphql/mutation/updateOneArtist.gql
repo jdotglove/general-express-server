@@ -1,0 +1,9 @@
+mutation UpdateOneArtist($artistId: String!, $artistPayload: ArtistPayloadInput!) {
+  updateOneArtist(input: {
+    artistId: $artistId
+    artistPayload: $artistPayload
+  }) {
+    _id
+    name
+  }
+}
