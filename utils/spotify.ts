@@ -101,7 +101,7 @@ export const resolveArtistsInDatabase = async (artists: Array<any>) => {
   return artistArray;
 }
 
-export const resolvePlaylistsInDatabase = async (playlists: Array<any>) => {
+export const resolvePlaylistsInDatabase = async (playlists: Array<any>, ownerId: string) => {
   const playlistArray = await Promise.all(playlists.map(async ({
     name,
     owner,
@@ -112,6 +112,7 @@ export const resolvePlaylistsInDatabase = async (playlists: Array<any>) => {
       spotifyUri: spotifyUri,
     }, {
       name,
+      ownerId,
       ownerUri: owner.uri,
       tracks,
       spotifyUri,

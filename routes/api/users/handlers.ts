@@ -3,10 +3,15 @@ import axios from '../../../plugins/axios';
 import {
   findOneArtist,
 } from '../../../db/services/artist';
+import getOneUser from '../../../plugins/graphql/query/getOneUser';
+import updateOneUser from '../../../plugins/graphql/mutation/updateOneUser';
+import {
+  graphQLRequest,
+} from '../../../plugins/graphql';
+import { translateGQLDocument } from '../../../utils/graphql';
 import {
   findOneUser,
   findOneUserAndUpdate,
-  updateOneUser,
   User,
 } from '../../../db/services/user';
 import { redisClientDo } from '../../../plugins/redis';
@@ -17,7 +22,7 @@ import {
   translateSpotifyTrackObject,
   translateSpotifyUserObject,
 } from '../../../utils/spotify';
-import { findOnePlaylist, Playlist } from '../../../db/services/playlist';
+import { Playlist } from '../../../db/services/playlist';
 import {
   findOneTrack,
   findOneTrackAndUpdate,
@@ -25,70 +30,92 @@ import {
 import mongoose from '../../../plugins/mongoose';
 
 export const getUserTopArtists = async (req: any, res: any) => {
-  const user = await findOneUser({
-    _id: req.params.id,
-  });
-  const userTopArtists = await Promise.all(user.topArtists.map(
-    async ({ reference }: { reference: mongoose.Types.ObjectId}) => {
-    const foundArtist = await findOneArtist({
-      _id: reference,
+  try {
+    const user = await findOneUser({
+      _id: req.params.id,
     });
-    return foundArtist;
-  }));
-  
-  res.status(200).send(userTopArtists).end();
+    const userTopArtists = await Promise.all(user.topArtists.map(
+      async ({ reference }: { reference: mongoose.Types.ObjectId}) => {
+      const foundArtist = await findOneArtist({
+        _id: reference,
+      });
+      return foundArtist;
+    }));
+    
+    res.status(200).send(userTopArtists).end();
+  } catch (error: any) {
+    res.status(500).send(error.message).end();
+  }
   return;
 }
 
 export const getUserTopTracks = async (req: any, res: any) => {
-  const user = await findOneUser({
-    _id: req.params.id,
-  });
-  const userTopTracks = await Promise.all(user.topTracks.map(async (trackId: mongoose.Types.ObjectId) => {
-    const foundTrack = await findOneTrack({
-      _id: trackId,
+  try {
+    const user = await findOneUser({
+      _id: req.params.id,
     });
-    return foundTrack;
-  }));
-
-  res.status(200).send(userTopTracks).end();
+    const userTopTracks = await Promise.all(user.topTracks.map(async (trackId: mongoose.Types.ObjectId) => {
+      const foundTrack = await findOneTrack({
+        _id: trackId,
+      });
+      return foundTrack;
+    }));
+  
+    res.status(200).send(userTopTracks).end();
+  } catch (error: any) {
+    res.status(500).send(error.message).end();
+  }
   return;
 }
 
 export const getUserPlaylists = async (req: any, res: any) => {
   let playlists: Playlist[];
   try {
-    const user = await findOneUser({
-      _id: req.params.id,
+    
+    const { data: { data } } = await graphQLRequest({
+      query: getOneUser,
+      variables: {
+        userId: req.params.id,
+      },
     });
+    let user = translateGQLDocument(data.getOneUser) as User;
+    console.log('User: ', user);
     const userSpotifyId = parseUriForId(user.spotifyUri);
 
-    const cachedSpotifyToken = await redisClientDo('get', `audionest:${user._id}:token`);
-    if (req.body.spotifyToken || cachedSpotifyToken) {
+    const cachedSpotifyToken = await redisClientDo('get', `audionest:${user._id.toString()}:token`);
+    console.log(userSpotifyId)
+    // if (req.body.spotifyToken || cachedSpotifyToken) {
       const { data: spotifyUserPlaylists } = await axios({
         method: 'get',
         url: `https://api.spotify.com/v1/users/${userSpotifyId}/playlists`,
         headers: { Authorization: `Bearer ${req.body.spotifyToken || cachedSpotifyToken}` },
       });
 
-      playlists = await resolvePlaylistsInDatabase(spotifyUserPlaylists.items);
-      await updateOneUser({
-        _id: user._id,
-      }, {
-        $set: {
-          playlists: playlists.map(({ _id }) => _id),
+      console.log(spotifyUserPlaylists.items.length)
+      playlists = await resolvePlaylistsInDatabase(spotifyUserPlaylists.items, req.params.id);
+      await graphQLRequest({
+        query: updateOneUser,
+        variables: {
+          userId: req.params.id,
+          userPayload: {
+            playlists: playlists.map(({ _id }) => _id.toString()),
+          },
         },
       });
-      await redisClientDo('set', `audionest:${user._id}:token`, req.body.spotifyToken || cachedSpotifyToken);
-    } else {
-      playlists = await Promise.all(user.playlists?.map(async (playlistId) => {
-        const playlist = await findOnePlaylist({
-          _id: playlistId,
-        });
-        await redisClientDo('set', `${playlist.spotifyUri}`, JSON.stringify(playlist));
-        return playlist;
-      }));
-    }
+
+      if (!cachedSpotifyToken && req.body.spotifyToken) {
+        await redisClientDo('set', `audionest:${user._id}:token`, req.body.spotifyToken);
+      }
+      
+    // } else {
+    //   playlists = await Promise.all(user.playlists?.map(async (playlistId: string) => {
+    //     const playlist = await findOnePlaylist({
+    //       _id: playlistId,
+    //     });
+    //     await redisClientDo('set', `${playlist.spotifyUri}`, JSON.stringify(playlist));
+    //     return playlist;
+    //   }));
+    // }
     
     if (!playlists || playlists.length === 0) {
       res.status(404).send('Playlists Not Found').end();
@@ -101,7 +128,7 @@ export const getUserPlaylists = async (req: any, res: any) => {
     res.status(500).send(error.message).end();
   }
   return;
-};
+}
 
 export const loginUser = async (req: any, res: any) => {
   let user: User;
@@ -121,9 +148,18 @@ export const loginUser = async (req: any, res: any) => {
       url: 'https://api.spotify.com/v1/me/top/artists',
       headers: { Authorization: `Bearer ${req.body.spotifyToken}` }
     });
-    console.log(spotifyUser)
     
     const databaseUserObject = translateSpotifyUserObject(spotifyUser);
+
+    user = await findOneUserAndUpdate({
+      spotifyUri: databaseUserObject.spotifyUri,
+    }, {
+      $set: databaseUserObject,
+    }, {
+      returnNewDocument: true,
+      upsert: true,
+    });
+    await redisClientDo('set', `audionest:${user._id.toString()}:token`, req.body.spotifyToken);
     const userTopArtists = await resolveArtistsInDatabase(spotifyUserTopArtists.items);
     const userTopTracks = await Promise.all(spotifyUserTopTracks.items.map(async (track: any) => {
       const databaseTrackObject = await translateSpotifyTrackObject(track);
@@ -142,19 +178,16 @@ export const loginUser = async (req: any, res: any) => {
       spotifyUri: databaseUserObject.spotifyUri,
     }, {
       $set: {
-        ...databaseUserObject,
         topArtists: userTopArtists,
         topTracks: userTopTracks.map(({ _id }) => _id),
       },
     }, {
       returnNewDocument: true,
-      upsert: true,
     });
     if (!user || !user.spotifyUri) {
       res.status(404).send('User Not Found').end();
     } else {
       await redisClientDo('set', `${user.spotifyUri}`, JSON.stringify(user));
-      await redisClientDo('set', `audionest:${user._id}:token`, req.body.spotifyToken);
       res.status(200).send(user).end();
     }
   } catch (error: any) {

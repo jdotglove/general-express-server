@@ -1,9 +1,0 @@
-mutation UpdateOneTrack($trackId: String!, $trackPayload: TrackPayloadInput!) {
-  updateOneTrack(input: {
-    trackId: $trackId
-    trackPayload: $trackPayload
-  }) {
-    _id
-    name
-  }
-}

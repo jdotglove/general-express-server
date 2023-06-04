@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 export interface PlaylistDocument extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
   name: string;
+  ownerId: mongoose.Types.ObjectId;
   ownerUri: string;
   spotifyUri: string;
   tracks: Array<any>;
@@ -12,6 +13,7 @@ export interface PlaylistDocument extends mongoose.Document {
 
 const PlaylistSchema = new Schema({
   name: String,
+  ownerId: Schema.Types.ObjectId,
   ownerUri: String,
   spotifyUri: String,
   tracks: Array,
