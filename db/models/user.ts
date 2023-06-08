@@ -13,10 +13,7 @@ export interface UserDocument extends mongoose.Document {
   images: Array<any>;
   playlists: Array<Playlist['_id']>;
   spotifyUri: string;
-  topArtists: Array<{
-    reference: Artist['_id'];
-    name: Artist['name'];
-  }>;
+  topArtists: Array<Artist['_id']>;
   topTracks: Array<Track['_id']>;
 }
 
@@ -33,10 +30,11 @@ const UserSchema = new Schema({
     type: Array,
   },
   spotifyUri: String,
-  topArtists: [{
-    reference: Schema.Types.ObjectId,
-    name: String,
-  }],
+  topArtists: {
+    default: [],
+    of: Schema.Types.ObjectId,
+    type: Array,
+  },
   topTracks: {
     default: [],
     of: Schema.Types.ObjectId,

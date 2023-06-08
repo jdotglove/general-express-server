@@ -3,15 +3,31 @@ import { Artist } from '../services/artist';
 
 const { Schema } = mongoose;
 
+type TrackAudioFeatures = {
+  acousticness: number;
+  analysisUrl: string;
+  danceability: number;
+  energy: number;
+  instrumentalness: number;
+  key: number;
+  liveness: number;
+  loudness: number;
+  mode: number;
+  speechiness: number;
+  spotifyUri: string;
+  tempo: number;
+  timeSignature: number;
+  valence: number;
+}
+
+
 export interface TrackDocument extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
   album: any;
-  artists: Array<{
-    reference: Artist['_id'];
-    name: Artist['name'];
-  }>;
+  artists: Array<Artist['_id']>;
+  audioFeatures: TrackAudioFeatures;
   availableMarkets: Array<string>;
-  duration: number;
+  durationMs: number;
   explicit: boolean;
   name: string;
   popularity: number;
@@ -24,15 +40,20 @@ const TrackSchema = new Schema({
     of: Schema.Types.Mixed,
     type: Object,
   },
-  artists: [{
-    reference: Schema.Types.ObjectId,
-    name: String,
-  }],
+  artists: {
+    default: [],
+    of: Schema.Types.ObjectId,
+    type: Array,
+  },
   availableMarkets: {
     of: String,
     type: Array,
   },
-  duration: Number,
+  audioFeatures: {
+    of: Schema.Types.Mixed,
+    type: Array
+  },
+  durationMs: Number,
   explicit: Boolean,
   name: String,
   popularity: Number,

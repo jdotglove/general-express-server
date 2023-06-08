@@ -1,5 +1,7 @@
+import { findOneAlbumAndUpdate } from '../db/services/album';
 import { findOneArtistAndUpdate } from '../db/services/artist';
 import { findOnePlaylistAndUpdate } from '../db/services/playlist';
+import { findOneTrackAndUpdate } from '../db/services/track';
 
 
 export const parseUriForId = (spotifyUri: string) => spotifyUri.split(':')[2];
@@ -24,7 +26,7 @@ export const translateSpotifyUserObject = ({
 });
 
 export const translateSpotifyUserPlaylistObject = (playlistArray: Array<any>) => (
-  playlistArray.map(({
+  playlistArray?.map(({
     country,
     name,
     owner,
@@ -41,7 +43,7 @@ export const translateSpotifyTrackObject = async ({
   album,
   artists,
   available_markets: availableMarkets,
-  duration,
+  duration_ms: durationMs,
   explicit,
   name,
   popularity,
@@ -52,7 +54,7 @@ export const translateSpotifyTrackObject = async ({
   album: any,
   artists: Array<any>,
   available_markets: Array<any>,
-  duration: number,
+  duration_ms: number,
   explicit: boolean,
   name: string,
   popularity: number,
@@ -65,7 +67,7 @@ export const translateSpotifyTrackObject = async ({
     album,
     artists: resolvedArtists,
     availableMarkets,
-    duration,
+    durationMs,
     explicit,
     name,
     popularity,
@@ -76,7 +78,7 @@ export const translateSpotifyTrackObject = async ({
 };
 
 export const resolveArtistsInDatabase = async (artists: Array<any>) => {
-  const artistArray = await Promise.all(artists.map(async ({
+  const artistArray = await Promise.all(artists?.map(async ({
     genres,
     name,
     popularity,
@@ -93,16 +95,13 @@ export const resolveArtistsInDatabase = async (artists: Array<any>) => {
       returnNewDocument: true,
       upsert: true,
     });
-    return {
-      name,
-      reference: savedArtist._id
-    };
+    return savedArtist._id;
   }));
   return artistArray;
 }
 
 export const resolvePlaylistsInDatabase = async (playlists: Array<any>, ownerId: string) => {
-  const playlistArray = await Promise.all(playlists.map(async ({
+  const playlistArray = await Promise.all(playlists?.map(async ({
     name,
     owner,
     tracks,
@@ -126,9 +125,45 @@ export const resolvePlaylistsInDatabase = async (playlists: Array<any>, ownerId:
   return playlistArray;
 }
 
-// export const resolveTracksInDatabase = async (tracks: Array<any>) => {
-//   const trackArray = await Promise.all(tracks.map(async ({
-//     name,
-//     spotifyUri,
-//   })))
-// }
+export const resolveTracksInDatabase = async (tracks: Array<any>) => {
+  const trackArray = await Promise.all(tracks?.map(async ({
+    track
+  }) => {
+    // const savedAlbum = await findOneAlbumAndUpdate({
+    //   spotifyUri: track.album.uri,
+    // }, {
+    //   albumType: track.album.album_type,
+    //   // artists: track.album.artists,
+    //   availableMarkets: track.album.available_markets,
+    //   name: track.album.name,
+    //   releaseDate: track.album.release_date,
+    //   releaseDatePrecision: track.album.release_date_precision,
+    //   spotifyUri: track.album.uri,
+    //   totalTrack: track.album.total_tracks,
+    // }, {
+    //   returnNewDocument: true,
+    //   upsert: true,
+    // });
+    const savedTrack = await findOneTrackAndUpdate({
+      spotifyUri: track.uri,
+    }, {
+      // album: savedAlbum?._id,
+      // artists,
+      availableMarkets: track.available_markets,
+      durationMs: track.duration_ms,
+      explicit: track.explicit,
+      name: track.name,
+      popularity: track.popularity,
+      spotifyUri: track.uri,
+      trackNumber: track.track_number,
+    }, {
+      returnNewDocument: true,
+      upsert: true,
+    });
+    if (savedTrack) {
+      return savedTrack;
+    }
+  }));
+
+  return trackArray;
+}

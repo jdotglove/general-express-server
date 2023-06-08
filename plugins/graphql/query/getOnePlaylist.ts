@@ -1,7 +1,7 @@
 import FullPlaylist from '../fragments/FullPlaylist';
 
-const getOnePlaylist = `query GetOnePlaylist($playlistId: String) {
-  getOnePlaylist( playlistId: $playlistId) {
+const getOnePlaylist = `query GetOnePlaylist($playlistId: String!) {
+  getOnePlaylist(query: { playlistId: $playlistId }) {
     ${FullPlaylist}
   }
 }`;

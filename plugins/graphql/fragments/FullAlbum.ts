@@ -1,5 +1,5 @@
 const FullAlbum = `
-  Id
+  _id
   albums
   genres
   name

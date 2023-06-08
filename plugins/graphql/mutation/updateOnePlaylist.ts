@@ -1,10 +1,7 @@
 import DefaultUpdateResponse from '../fragments/DefaultUpdateResponse';
 
-const updateOnePlaylist = `mutation UpdateOnePlaylist($playlistId: String!, $playlistPayload: PlaylistPayloadInput!) {
-  updateOnePlaylist(input: {
-    playlistId: $playlistId
-    playlistPayload: $playlistPayload
-  }) {
+const updateOnePlaylist = `mutation UpdateOnePlaylist($playlistId: String!, $playlistPayload: PlaylistPayload!) {
+  updateOnePlaylist(input: { playlistId: $playlistId, playlistPayload: $playlistPayload }) {
     ${DefaultUpdateResponse}
   }
 }`;

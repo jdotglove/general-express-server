@@ -1,7 +1,7 @@
 import FullArtist from '../fragments/FullArtist';
 
-const getOneArtist = `query GetOneArtist($artistId: String) {
-  getOneArtist(input: { artistId: $artistId }) {
+const getOneArtist = `query GetOneArtist($artistId: String!) {
+  getOneArtist(query: { artistId: $artistId }) {
     ${FullArtist}
   }
 }`;

@@ -1,7 +1,7 @@
 import FullTrack from '../fragments/FullTrack';
 
-const getOneTrack = `query GetOneTrack($trackId: String) {
-  getOneTrack(input: { trackId: $trackId }) {
+const getOneTrack = `query GetOneTrack($trackId: String!) {
+  getOneTrack(query: { trackId: $trackId }) {
     ${FullTrack}
   }
 }`;

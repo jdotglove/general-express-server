@@ -1,7 +1,7 @@
 import FullUser from '../fragments/FullUser';
 
-const getOneUser = `query GetOneUser($userId: String) {
-  getOneUser(userId: $userId) {
+const getOneUser = `query GetOneUser($userId: String!) {
+  getOneUser(query: { userId: $userId }) {
     ${FullUser}
   }
 }`;

@@ -14,6 +14,7 @@ export interface ArtistDocument extends mongoose.Document {
 
 const ArtistSchema = new Schema({
   albums: {
+    default: [],
     of: Schema.Types.ObjectId,
     type: Array,
   },

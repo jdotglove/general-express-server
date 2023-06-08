@@ -6,31 +6,29 @@ const { Schema } = mongoose;
 export interface AlbumDocument extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
   albumType: string;
-  artists: Array<{
-    reference: Artist['_id'];
-    name: Artist['name'];
-  }>;
+  artists: Array<Artist['_id']>;
   availableMarkets: Array<string>;
   name: string;
   releaseDate: string;
-  releaseDatePercision: string;
+  releaseDatePrecision: string;
   spotifyUri: string;
   totalTracks: number;
 }
 
 const AlbumSchema = new Schema({
   albumType: String,
-  artists: [{
-    reference: Schema.Types.ObjectId,
-    name: String,
-  }],
+  artists: {
+    default: [],
+    of: Schema.Types.ObjectId,
+    type: Array,
+  },
   availableMarkets: {
     of: String,
     type: Array,
   },
   name: String,
   releaseDate: String,
-  releaseDatePercision: String,
+  releaseDatePrecision: String,
   spotifyUri: String,
   totalTracks: Number,
 });

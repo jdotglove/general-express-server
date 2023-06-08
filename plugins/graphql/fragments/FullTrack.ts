@@ -1,7 +1,12 @@
+import FullTrackAudioFeatures from "./FullTrackAudioFeatures";
+
 const FullTrack = `
-  Id
+  _id
   album
   artists
+  audioFeatures {
+    ${FullTrackAudioFeatures}
+  }
   availableMarkets
   name
   popularity
