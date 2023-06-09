@@ -1,9 +1,0 @@
-mutation UpdateOnePlaylist($playlistId: String!, $playlistPayload: PlaylistPayloadInput!) {
-  updateOnePlaylist(input: {
-    playlistId: $playlistId
-    playlistPayload: $playlistPayload
-  }) {
-    _id
-    name
-  }
-}

@@ -1,6 +1,0 @@
-query GetOnePlaylist($playlistId: String) {
-  getOnePlaylist(input: { playlist: $playlistId }) {
-    _id
-    name
-  }
-}

@@ -1,6 +1,0 @@
-query GetOneArtist($artistId: String) {
-  getOneArtist(input: { artistId: $artistId }) {
-    _id
-    name
-  }
-}
