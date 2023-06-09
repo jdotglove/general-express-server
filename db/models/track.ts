@@ -51,7 +51,7 @@ const TrackSchema = new Schema({
   },
   audioFeatures: {
     of: Schema.Types.Mixed,
-    type: Array
+    type: Object,
   },
   durationMs: Number,
   explicit: Boolean,

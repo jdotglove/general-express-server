@@ -9,9 +9,9 @@ import {
 
 const router = Router();
 
-router.post('/user/:id/playlists', getUserPlaylists);
-router.post('/user/:id/top-artists', getUserTopArtists);
-router.post('/user/:id/top-tracks', getUserTopTracks);
+router.get('/user/:id/playlists', getUserPlaylists);
+router.get('/user/:id/top-artists', getUserTopArtists);
+router.get('/user/:id/top-tracks', getUserTopTracks);
 
 router.post('/user/login', loginUser);
 

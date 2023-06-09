@@ -92,7 +92,7 @@ export const getUserPlaylists = async (req: any, res: any) => {
       const { data: spotifyUserPlaylists } = await axios({
         method: 'get',
         url: `https://api.spotify.com/v1/users/${userSpotifyId}/playlists`,
-        headers: { Authorization: `Bearer ${req.body.spotifyToken}` },
+        headers: { Authorization: `Bearer ${req.query.token}` },
       });
 
       playlists = await resolvePlaylistsInDatabase(spotifyUserPlaylists.items, req.params.id);
@@ -135,17 +135,17 @@ export const loginUser = async (req: any, res: any) => {
     const { data: spotifyUser } = await axios({
       method: 'get',
       url: 'https://api.spotify.com/v1/me',
-      headers: { Authorization: `Bearer ${req.body.spotifyToken}` }
+      headers: { Authorization: `Bearer ${req.query.token}` }
     });
     const { data: spotifyUserTopTracks } = await axios({
       method: 'get',
       url: 'https://api.spotify.com/v1/me/top/tracks',
-      headers: { Authorization: `Bearer ${req.body.spotifyToken}` }
+      headers: { Authorization: `Bearer ${req.query.token}` }
     });
     const { data: spotifyUserTopArtists } = await axios({
       method: 'get',
       url: 'https://api.spotify.com/v1/me/top/artists',
-      headers: { Authorization: `Bearer ${req.body.spotifyToken}` }
+      headers: { Authorization: `Bearer ${req.query.token}` }
     });
     
     const databaseUserObject = translateSpotifyUserObject(spotifyUser);

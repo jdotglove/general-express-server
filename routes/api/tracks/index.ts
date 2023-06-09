@@ -1,14 +1,18 @@
 import { Router } from 'express';
 
 import {
+  getSelectedTracks,
+  getTrack,
   getTrackArtists,
-  getTracksAudioFeatures,
+  getTrackAudioFeatures,
 } from './handlers';
 
 const router = Router();
 
-router.post('/track/audio-features', getTracksAudioFeatures);
-router.post('/track/:id/artists', getTrackArtists);
+router.get('/track/:id/audio-features', getTrackAudioFeatures);
+router.get('/track/:id/artists', getTrackArtists);
+router.get('/track/:id', getTrack);
+router.get('/track', getSelectedTracks);
 
 
 export default router;

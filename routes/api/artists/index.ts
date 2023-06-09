@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
 import {
-    getPlaylistTracks,
+    getArtist,
 } from './handlers';
 
 const router = Router();
 
-router.get('/playlist/:id/tracks', getPlaylistTracks);
+router.get('/artist/:id', getArtist);
 
 
 export default router;
