@@ -8,7 +8,6 @@ import updateOneUser from '../../../plugins/graphql/mutation/updateOneUser';
 import {
   graphQLRequest,
 } from '../../../plugins/graphql';
-import { translateGQLDocument } from '../../../utils/graphql';
 import {
   findOneUser,
   findOneUserAndUpdate,
@@ -31,13 +30,16 @@ import mongoose from '../../../plugins/mongoose';
 
 export const getUserTopArtists = async (req: any, res: any) => {
   try {
-    const { data: { data } } = await graphQLRequest({
-      query: getOneUser,
-      variables: {
-        userId: req.params.id,
-      },
-    });
-    let user = data?.getOneUser as User;
+    // const { data: { data } } = await graphQLRequest({
+    //   query: getOneUser,
+    //   variables: {
+    //     userId: req.params.id,
+    //   },
+    // });
+    // let user = data?.getOneUser as User;
+    const user = await findOneUser({
+      _id: req.params.id,
+    })
     const userTopArtists = await Promise.all(user.topArtists.map(
       async (topArtistId: mongoose.Types.ObjectId) => {
       const foundArtist = await findOneArtist({
@@ -55,13 +57,14 @@ export const getUserTopArtists = async (req: any, res: any) => {
 
 export const getUserTopTracks = async (req: any, res: any) => {
   try {
-    const { data: { data } } = await graphQLRequest({
-      query: getOneUser,
-      variables: {
-        userId: req.params.id,
-      },
-    });
-    let user = data?.getOneUser as User;
+    // const { data: { data } } = await graphQLRequest({
+    //   query: getOneUser,
+    //   variables: {
+    //     userId: req.params.id,
+    //   },
+    // });
+    // let user = data?.getOneUser as User;
+    const user = await findOneUser({ _id: req.params.id })
     const userTopTracks = await Promise.all(user.topTracks.map(async (trackId: mongoose.Types.ObjectId) => {
       const foundTrack = await findOneTrack({
         _id: trackId,
@@ -79,13 +82,14 @@ export const getUserTopTracks = async (req: any, res: any) => {
 export const getUserPlaylists = async (req: any, res: any) => {
   let playlists: Playlist[];
   try {
-    const { data: { data } } = await graphQLRequest({
-      query: getOneUser,
-      variables: {
-        userId: req.params.id,
-      },
-    });
-    let user = data?.getOneUser as User;
+    // const { data: { data } } = await graphQLRequest({
+    //   query: getOneUser,
+    //   variables: {
+    //     userId: req.params.id,
+    //   },
+    // });
+    // let user = data?.getOneUser as User;
+    const user = await findOneUser({ _id: req.params.id })
     const userSpotifyId = parseUriForId(user.spotifyUri);
 
     // if (req.body.spotifyToken || cachedSpotifyToken) {

@@ -2,20 +2,21 @@ import axios from '../../../plugins/axios';
 import mongoose from '../../../plugins/mongoose';
 import getOnePlaylist from '../../../plugins/graphql/query/getOnePlaylist';
 import { parseUriForId, resolveTracksInDatabase } from '../../../utils/spotify';
-import { Playlist } from '../../../db/services/playlist';
+import { findOnePlaylist } from '../../../db/services/playlist';
 import { graphQLRequest } from '../../../plugins/graphql';
 import { translateGQLDocument } from '../../../utils/graphql';
 import { redisClientDo } from '../../../plugins/redis';
 
 export const getPlaylistTracks = async (req: any, res: any) => {
   try {
-    const { data: { data } } = await graphQLRequest({
-      query: getOnePlaylist,
-      variables: {
-        playlistId: req.params.id,
-      },
-    });
-    let playlist = data?.getOnePlaylist as Playlist;
+    // const { data: { data } } = await graphQLRequest({
+    //   query: getOnePlaylist,
+    //   variables: {
+    //     playlistId: req.params.id,
+    //   },
+    // });
+    // let playlist = data?.getOnePlaylist as Playlist;
+    const playlist = await findOnePlaylist({ _id: req.params.id })
     // await redisClientDo('get', )
     const playlistSpotifyId = parseUriForId(playlist.spotifyUri);
     const { data: spotifyPlaylistTracks } = await axios({
