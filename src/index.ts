@@ -21,8 +21,6 @@ app.get('/', (req, res) => {
   res.send('Hello from App Engine!');
 });
 
-app.enable('trust proxy');
-
 // start the Express server
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);
