@@ -4,13 +4,13 @@ import {
   findOneArtist,
 } from '../../../db/services/artist';
 import getOneUser from '../../../plugins/graphql/query/getOneUser';
-import updateOneUser from '../../../plugins/graphql/mutation/updateOneUser';
 import {
   graphQLRequest,
 } from '../../../plugins/graphql';
 import {
   findOneUser,
   findOneUserAndUpdate,
+  updateOneUser,
   User,
 } from '../../../db/services/user';
 import { redisClientDo } from '../../../plugins/redis';
@@ -100,16 +100,20 @@ export const getUserPlaylists = async (req: any, res: any) => {
       });
 
       playlists = await resolvePlaylistsInDatabase(spotifyUserPlaylists.items, req.params.id);
-      await graphQLRequest({
-        query: updateOneUser,
-        variables: {
-          userId: req.params.id,
-          userPayload: {
-            playlists: playlists.map(({ _id }) => _id.toString()),
-          },
-        },
-      });
-      
+      // await graphQLRequest({
+      //   query: updateOneUser,
+      //   variables: {
+      //     userId: req.params.id,
+      //     userPayload: {
+      //       playlists: playlists.map(({ _id }) => _id.toString()),
+      //     },
+      //   },
+      // });
+      await updateOneUser({
+        _id: req.params.id
+      }, {
+        playlists: playlists.map(({ _id }) => _id.toString()),
+      })
     // } else {
     //   playlists = await Promise.all(user.playlists?.map(async (playlistId: string) => {
     //     const playlist = await findOnePlaylist({
@@ -119,7 +123,6 @@ export const getUserPlaylists = async (req: any, res: any) => {
     //     return playlist;
     //   }));
     // }
-    
     if (!playlists || playlists.length === 0) {
       res.status(404).send('Playlists Not Found').end();
       return;
