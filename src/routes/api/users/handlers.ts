@@ -29,17 +29,21 @@ import {
 import mongoose from '../../../plugins/mongoose';
 
 export const getUserTopArtists = async (req: any, res: any) => {
+  let user;
   try {
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneUser,
-    //   variables: {
-    //     userId: req.params.id,
-    //   },
-    // });
-    // let user = data?.getOneUser as User;
-    const user = await findOneUser({
-      _id: req.params.id,
-    })
+    if (process.env.NODE_ENV === 'development') {
+      console.log('GetUserTopArtists Running GraphQL Query');
+      const { data: { data } } = await graphQLRequest({
+        query: getOneUser,
+        variables: {
+          userId: req.params.id,
+        },
+      });
+      user = data?.getOneUser as User;
+    } else {
+      user = await findOneUser({ _id: req.params.id });
+    }
+
     const userTopArtists = await Promise.all(user.topArtists.map(
       async (topArtistId: mongoose.Types.ObjectId) => {
       const foundArtist = await findOneArtist({
@@ -56,15 +60,21 @@ export const getUserTopArtists = async (req: any, res: any) => {
 }
 
 export const getUserTopTracks = async (req: any, res: any) => {
+  let user;
   try {
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneUser,
-    //   variables: {
-    //     userId: req.params.id,
-    //   },
-    // });
-    // let user = data?.getOneUser as User;
-    const user = await findOneUser({ _id: req.params.id })
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('GetUserTopTracks Running GraphQL Query')
+      const { data: { data } } = await graphQLRequest({
+        query: getOneUser,
+        variables: {
+          userId: req.params.id,
+        },
+      });
+      user = data?.getOneUser as User;
+    } else {
+      user = await findOneUser({ _id: req.params.id });
+    }
+
     const userTopTracks = await Promise.all(user.topTracks.map(async (trackId: mongoose.Types.ObjectId) => {
       const foundTrack = await findOneTrack({
         _id: trackId,
@@ -81,15 +91,21 @@ export const getUserTopTracks = async (req: any, res: any) => {
 
 export const getUserPlaylists = async (req: any, res: any) => {
   let playlists: Playlist[];
+  let user;
   try {
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneUser,
-    //   variables: {
-    //     userId: req.params.id,
-    //   },
-    // });
-    // let user = data?.getOneUser as User;
-    const user = await findOneUser({ _id: req.params.id })
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('GetUserPlaylists Running GraphQL Query');
+      const { data: { data } } = await graphQLRequest({
+        query: getOneUser,
+        variables: {
+          userId: req.params.id,
+        },
+      });
+      user = data?.getOneUser as User;
+    } else {
+      user = await findOneUser({ _id: req.params.id });
+    }
+  
     const userSpotifyId = parseUriForId(user.spotifyUri);
 
     // if (req.body.spotifyToken || cachedSpotifyToken) {
@@ -113,7 +129,7 @@ export const getUserPlaylists = async (req: any, res: any) => {
         _id: req.params.id
       }, {
         playlists: playlists.map(({ _id }) => _id.toString()),
-      })
+      });
     // } else {
     //   playlists = await Promise.all(user.playlists?.map(async (playlistId: string) => {
     //     const playlist = await findOnePlaylist({

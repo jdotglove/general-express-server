@@ -6,6 +6,31 @@ import { findOneTrackAndUpdate } from '../db/services/track';
 
 export const parseUriForId = (spotifyUri: string) => spotifyUri.split(':')[2];
 
+export const formatSpotifyRecommendationRequest = (
+  recommendationPayload: Record<string, string | number | Array<string>>
+) => {
+  // const isSeedField = (field: string ) => {
+  //   if (
+  //     field === 'seed_artists'
+  //     || field === 'seed_genres'
+  //     || field === 'seed_tracks'
+  //   ) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
+  const joinedQuery = Object.keys(recommendationPayload).reduce((acc: string, currKey: string) => {
+    if (
+      recommendationPayload[currKey] !== ''
+    ) {
+      return acc + `${currKey}=${JSON.stringify(recommendationPayload[currKey])}&`;
+    }
+    return acc
+  }, '');
+  // console.log(joinedQuery);
+  return joinedQuery;
+}
+
 export const translateSpotifyUserObject = ({
   country,
   display_name: displayName,

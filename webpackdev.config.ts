@@ -1,6 +1,6 @@
-const webpack = require('webpack');
-const pathDev = require('path');
-const nodeExternalsDev = require('webpack-node-externals');
+import webpack from 'webpack';
+import pathDev from 'path';
+import nodeExternalsDev from 'webpack-node-externals';
 
 module.exports = {
     entry: ['webpack/hot/poll?100', './src/index.ts'],
@@ -25,8 +25,4 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     plugins: [new webpack.HotModuleReplacementPlugin()],
-    output: {
-        path: pathDev.join(__dirname, 'build'),
-        filename: 'index.js'
-    }
 };

@@ -9,16 +9,21 @@ import { redisClientDo } from '../../../plugins/redis';
 //import updateOneTrack from '../../../plugins/graphql/mutation/updateOneTrack';
 
 export const getTrack = async (req: any, res: any) => {
+  let track;
   try {
-    // TODO: Come back to graphql request
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneTrack,
-    //   variables: {
-    //     trackId: req.params.id,
-    //   },
-    // });
-    // const track = data?.getOneTrack as Track;
-    const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id)})
+    if (process.env.NODE_ENV === 'development') {
+      console.log('GetTrack Running GraphQL Query');
+      const { data: { data } } = await graphQLRequest({
+        query: getOneTrack,
+        variables: {
+          trackId: req.params.id,
+        },
+      });
+      track = data?.getOneTrack as Track;
+    } else {
+      track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id)});
+    }
+
     res.status(200).send(track).end();
   } catch(error: any) {
     console.error('Error retrieving track: ', error.message);
