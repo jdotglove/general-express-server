@@ -35,3 +35,23 @@ export const getArtist = async (req: any, res: any) => {
   }
   return;
 }
+
+export const searchForArtist = async (req: any, res: any) => {
+  try {
+    const { data: spotifyArtistSearch } = await axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/search?q=${req.body.query}&type=${req.body.type}&limit=3`,
+      headers: { Authorization: `Bearer ${req.query.token}` },
+    });
+    const possibleArtists = spotifyArtistSearch.artists.items;
+    if (!possibleArtists) {
+      res.status(404).send('No artists found with this search query').end();
+    } else {
+      res.status(200).send(possibleArtists).end();
+    }
+  } catch (error: any) {
+    console.error('Error searching for artist', error);
+    res.status(500).send(error.message).end();
+  }
+  return;
+}

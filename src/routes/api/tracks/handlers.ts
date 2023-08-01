@@ -21,11 +21,11 @@ export const getTrack = async (req: any, res: any) => {
       });
       track = data?.getOneTrack as Track;
     } else {
-      track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id)});
+      track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) });
     }
 
     res.status(200).send(track).end();
-  } catch(error: any) {
+  } catch (error: any) {
     console.error('Error retrieving track: ', error.message);
     res.status(500).send(error.message).end();
   }
@@ -83,72 +83,92 @@ export const getSelectedTracks = async (req: any, res: any) => {
   return;
 }
 
-  export const getTrackArtists = async (req: any, res: any) => {
-    try {
-      // const { data: { data } } = await graphQLRequest({
-      //   query: getOneTrack,
-      //   variables: {
-      //     trackId: req.params.id,
-      //   },
-      // });
-      const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id)})
-      // let track = data.getOneTrack as Track;
-      // console.log('Found Track: ', track);
-      //   console.log('Track: ', track);
-    } catch (error: any) {
-      console.error('Error retrieving tracks: ', error.message);
-      res.status(500).send(error.message).end();
-    }
-
-    res.status(200).send().end();
-    return;
+export const getTrackArtists = async (req: any, res: any) => {
+  try {
+    // const { data: { data } } = await graphQLRequest({
+    //   query: getOneTrack,
+    //   variables: {
+    //     trackId: req.params.id,
+    //   },
+    // });
+    const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) })
+    // let track = data.getOneTrack as Track;
+    // console.log('Found Track: ', track);
+    //   console.log('Track: ', track);
+  } catch (error: any) {
+    console.error('Error retrieving tracks: ', error.message);
+    res.status(500).send(error.message).end();
   }
 
-  export const getTrackAudioFeatures = async (req: any, res: any) => {
-    try {
-      // const { data: { data } } = await graphQLRequest({
-      //   query: getOneTrack,
-      //   variables: {
-      //     trackId: req.params.id,
-      //   },
-      // });
-      // let track = data?.getOneTrack as Track;
-      const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id)})
-      const idString = parseUriForId(track.spotifyUri)
-      const { data: spotifyTracksAudioFeatures } = await axios({
-        method: 'get',
-        url: `https://api.spotify.com/v1/audio-features?ids=${idString}`,
-        headers: { Authorization: `Bearer ${req.query.token}` },
-      });
-      const spotifyTrackAudioFeatures = spotifyTracksAudioFeatures.audio_features[0];
-      const trackFeatures = {
-        acousticness: spotifyTrackAudioFeatures.acousticness,
-        analysisUrl: spotifyTrackAudioFeatures.analysis_url,
-        danceability: spotifyTrackAudioFeatures.danceability,
-        energy: spotifyTrackAudioFeatures.energy,
-        instrumentalness: spotifyTrackAudioFeatures.instrumentalness,
-        key: spotifyTrackAudioFeatures.key,
-        liveness: spotifyTrackAudioFeatures.liveness,
-        loudness: spotifyTrackAudioFeatures.loudness,
-        mode: spotifyTrackAudioFeatures.mode,
-        speechiness: spotifyTrackAudioFeatures.speechiness,
-        spotifyUri: spotifyTrackAudioFeatures.uri,
-        tempo: spotifyTrackAudioFeatures.tempo,
-        timeSignature: spotifyTrackAudioFeatures.time_signature,
-        valence: spotifyTrackAudioFeatures.valence,
-      };
-      updateOneTrack({
-        spotifyUri: trackFeatures.spotifyUri,
-      }, {
-        $set: {
-          audioFeatures: trackFeatures,
-        },
-      });
+  res.status(200).send().end();
+  return;
+}
 
-      res.status(200).send(trackFeatures).end();
-    } catch (error: any) {
-      console.error('Error retrieving audio features for track: ', error.message);
-      res.status(500).send(error.message).end();
-    }
-    return;
+export const getTrackAudioFeatures = async (req: any, res: any) => {
+  try {
+    // const { data: { data } } = await graphQLRequest({
+    //   query: getOneTrack,
+    //   variables: {
+    //     trackId: req.params.id,
+    //   },
+    // });
+    // let track = data?.getOneTrack as Track;
+    const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) })
+    const idString = parseUriForId(track.spotifyUri)
+    const { data: spotifyTracksAudioFeatures } = await axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/audio-features?ids=${idString}`,
+      headers: { Authorization: `Bearer ${req.query.token}` },
+    });
+    const spotifyTrackAudioFeatures = spotifyTracksAudioFeatures.audio_features[0];
+    const trackFeatures = {
+      acousticness: spotifyTrackAudioFeatures.acousticness,
+      analysisUrl: spotifyTrackAudioFeatures.analysis_url,
+      danceability: spotifyTrackAudioFeatures.danceability,
+      energy: spotifyTrackAudioFeatures.energy,
+      instrumentalness: spotifyTrackAudioFeatures.instrumentalness,
+      key: spotifyTrackAudioFeatures.key,
+      liveness: spotifyTrackAudioFeatures.liveness,
+      loudness: spotifyTrackAudioFeatures.loudness,
+      mode: spotifyTrackAudioFeatures.mode,
+      speechiness: spotifyTrackAudioFeatures.speechiness,
+      spotifyUri: spotifyTrackAudioFeatures.uri,
+      tempo: spotifyTrackAudioFeatures.tempo,
+      timeSignature: spotifyTrackAudioFeatures.time_signature,
+      valence: spotifyTrackAudioFeatures.valence,
+    };
+    updateOneTrack({
+      spotifyUri: trackFeatures.spotifyUri,
+    }, {
+      $set: {
+        audioFeatures: trackFeatures,
+      },
+    });
+
+    res.status(200).send(trackFeatures).end();
+  } catch (error: any) {
+    console.error('Error retrieving audio features for track: ', error.message);
+    res.status(500).send(error.message).end();
   }
+  return;
+}
+
+export const searchForTrack = async (req: any, res: any) => {
+  try {
+    const { data: spotifyTrackSearch } = await axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/search?q=${req.body.query}&type=${req.body.type}&limit=3`,
+      headers: { Authorization: `Bearer ${req.query.token}` },
+    });
+    const possibleTracks = spotifyTrackSearch.tracks.items;
+    if (!possibleTracks) {
+      res.status(404).send('No tracks found with this search query').end();
+    } else {
+      res.status(200).send(possibleTracks).end();
+    }
+  } catch (error: any) {
+    console.error('Error searching for track', error.message);
+    res.status(500).send(error.message).end();
+  }
+  return;
+}
