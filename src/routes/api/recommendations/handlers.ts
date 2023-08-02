@@ -48,7 +48,6 @@ export const getSeedGenres = async (req: any, res: any) => {
       url: 'https://api.spotify.com/v1/recommendations/available-genre-seeds',
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    console.log('Genre Resopnse ', spotifyAvailableGenreSeeds);
     const genres = spotifyAvailableGenreSeeds.genres;
     if (!genres) {
       res.status(404).send('No Seed Genres Available').end()

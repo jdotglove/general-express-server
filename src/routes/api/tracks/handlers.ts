@@ -85,16 +85,19 @@ export const getSelectedTracks = async (req: any, res: any) => {
 
 export const getTrackArtists = async (req: any, res: any) => {
   try {
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneTrack,
-    //   variables: {
-    //     trackId: req.params.id,
-    //   },
-    // });
-    const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) })
-    // let track = data.getOneTrack as Track;
-    // console.log('Found Track: ', track);
-    //   console.log('Track: ', track);
+    let track;
+    if (process.env.NODE_ENV === 'development') {
+      const { data: { data } } = await graphQLRequest({
+        query: getOneTrack,
+        variables: {
+          trackId: req.params.id,
+        },
+      });
+      track = data.getOneTrack as Track;
+    } else {
+      track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) });
+    }
+    
   } catch (error: any) {
     console.error('Error retrieving tracks: ', error.message);
     res.status(500).send(error.message).end();
@@ -106,14 +109,17 @@ export const getTrackArtists = async (req: any, res: any) => {
 
 export const getTrackAudioFeatures = async (req: any, res: any) => {
   try {
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneTrack,
-    //   variables: {
-    //     trackId: req.params.id,
-    //   },
-    // });
-    // let track = data?.getOneTrack as Track;
-    const track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) })
+    let track;
+    if (process.env.NODE_ENV === 'development') {
+      const { data: { data } } = await graphQLRequest({
+        query: getOneTrack,
+        variables: {
+          trackId: req.params.id,
+        },
+      });
+      track = data?.getOneTrack as Track;
+    }
+    track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) })
     const idString = parseUriForId(track.spotifyUri)
     const { data: spotifyTracksAudioFeatures } = await axios({
       method: 'get',
