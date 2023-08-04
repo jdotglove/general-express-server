@@ -45,3 +45,7 @@ export const getPlaylistTracks = async (req: any, res: any) => {
   res.status(200).send().end();
   return;
 }
+
+export const saveNewPlaylist = () => {
+  
+}

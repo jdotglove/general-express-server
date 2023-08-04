@@ -163,9 +163,11 @@ export const searchForTrack = async (req: any, res: any) => {
   try {
     const { data: spotifyTrackSearch } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/search?q=${req.body.query}&type=${req.body.type}&limit=3`,
+      url: `https://api.spotify.com/v1/search?q=${encodeURI(req.body.query)}&type=${req.body.type}&limit=3`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
+    console.log('Track Search Results: ', spotifyTrackSearch.tracks.items);
+    console.log('Track Images: ', spotifyTrackSearch.tracks.items[0].images);
     const possibleTracks = spotifyTrackSearch.tracks.items;
     if (!possibleTracks) {
       res.status(404).send('No tracks found with this search query').end();
