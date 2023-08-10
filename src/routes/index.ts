@@ -9,7 +9,7 @@ import { secured } from '../middleware/authorization';
 
 const router = Router();
 
-// General Rout
+// General Routes
 
 // This section will help you get a list of all the records.
 router.use(secured, artistsApi);

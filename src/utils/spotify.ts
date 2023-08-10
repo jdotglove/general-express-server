@@ -9,16 +9,6 @@ export const parseUriForId = (spotifyUri: string) => spotifyUri.split(':')[2];
 export const formatSpotifyRecommendationRequest = (
   recommendationPayload: Record<string, string | number | Array<string>>
 ) => {
-  // const isSeedField = (field: string ) => {
-  //   if (
-  //     field === 'seed_artists'
-  //     || field === 'seed_genres'
-  //     || field === 'seed_tracks'
-  //   ) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
   const joinedQuery = Object.keys(recommendationPayload).reduce((acc: string, currKey: string) => {
     if (
       recommendationPayload[currKey] !== ''
@@ -27,7 +17,7 @@ export const formatSpotifyRecommendationRequest = (
     }
     return acc
   }, '');
-  // console.log(joinedQuery);
+  
   return joinedQuery;
 }
 
@@ -103,19 +93,14 @@ export const translateSpotifyTrackObject = async ({
 };
 
 export const resolveArtistsInDatabase = async (artists: Array<any>) => {
-  const artistArray = await Promise.all(artists?.map(async ({
-    genres,
-    name,
-    popularity,
-    uri: spotifyUri
-  }) => {
+  const artistArray = await Promise.all(artists?.map(async (artist) => {
     const savedArtist = await findOneArtistAndUpdate({
-      spotifyUri: spotifyUri,
+      spotifyUri: artist.uri,
     }, {
-      genres,
-      name,
-      popularity,
-      spotifyUri,
+      genres: artist.genres,
+      name: artist.name,
+      popularity: artist.popularity,
+      spotifyUri: artist.uri,
     }, {
       returnNewDocument: true,
       upsert: true,
@@ -154,26 +139,9 @@ export const resolveTracksInDatabase = async (tracks: Array<any>) => {
   const trackArray = await Promise.all(tracks?.map(async ({
     track
   }) => {
-    // const savedAlbum = await findOneAlbumAndUpdate({
-    //   spotifyUri: track.album.uri,
-    // }, {
-    //   albumType: track.album.album_type,
-    //   // artists: track.album.artists,
-    //   availableMarkets: track.album.available_markets,
-    //   name: track.album.name,
-    //   releaseDate: track.album.release_date,
-    //   releaseDatePrecision: track.album.release_date_precision,
-    //   spotifyUri: track.album.uri,
-    //   totalTrack: track.album.total_tracks,
-    // }, {
-    //   returnNewDocument: true,
-    //   upsert: true,
-    // });
     const savedTrack = await findOneTrackAndUpdate({
       spotifyUri: track.uri,
     }, {
-      // album: savedAlbum?._id,
-      // artists,
       availableMarkets: track.available_markets,
       durationMs: track.duration_ms,
       explicit: track.explicit,

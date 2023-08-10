@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import {
+  createUserPlaylist,
   getUserTopArtists,
   getUserTopTracks,
   getUserPlaylists,
@@ -13,6 +14,7 @@ router.get('/user/:id/playlists', getUserPlaylists);
 router.get('/user/:id/top-artists', getUserTopArtists);
 router.get('/user/:id/top-tracks', getUserTopTracks);
 
+router.post('/user/:id/playlist', createUserPlaylist);
 router.post('/user/login', loginUser);
 
 
