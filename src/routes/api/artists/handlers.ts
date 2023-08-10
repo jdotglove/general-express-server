@@ -7,25 +7,37 @@ import { graphQLRequest } from '../../../plugins/graphql';
 import { redisClientDo } from '../../../plugins/redis';
 
 export const getArtist = async (req: any, res: any) => {
+  let artist;
   try {
-    // const { data: { data } } = await graphQLRequest({
-    //   query: getOneArtist,
-    //   variables: {
-    //     artistId: req.params.id,
-    //   },
-    // });
-    // let artist = data?.getOneArtist as Artist;
-    const artist = await findOneArtist({ _id: req.params.id })
-    // await redisClientDo('get', )
-    if (!artist) {
-      res.status(404).send('Tracks Not Found').end();
-      return;
-    } else {
-      res.status(200).send(artist).end();
-    }
+    const { data: spotifyGetArtist } = await axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/artists/${req.params.id}`,
+      headers: { Authorization: `Bearer ${req.query.token}` },
+    });
+    res.status(200).send(spotifyGetArtist);
 
   } catch (error: any) {
-    console.error('Error retrieving playlist tracks: ', error.message);
+    console.error('Error retrieving artist: ', error.message);
+    res.status(500).send(error.message).end();
+  }
+  return;
+}
+
+export const searchForArtist = async (req: any, res: any) => {
+  try {
+    const { data: spotifyArtistSearch } = await axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/search?q=${encodeURI(req.body.query)}&type=${req.body.type}&limit=3`,
+      headers: { Authorization: `Bearer ${req.query.token}` },
+    });
+    const possibleArtists = spotifyArtistSearch.artists.items;
+    if (!possibleArtists) {
+      res.status(404).send('No artists found with this search query').end();
+    } else {
+      res.status(200).send(possibleArtists).end();
+    }
+  } catch (error: any) {
+    console.error('Error searching for artist', error);
     res.status(500).send(error.message).end();
   }
   return;

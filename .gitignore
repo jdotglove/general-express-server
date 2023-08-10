@@ -1,6 +1,7 @@
 node_modules
 .env
 build
+dist
 app.yaml
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

@@ -1,10 +1,13 @@
 import { Router } from 'express';
 
 import {
-    getArtist,
+  getArtist,
+  searchForArtist,
 } from './handlers';
 
 const router = Router();
+
+router.post('/artist/search', searchForArtist);
 
 router.get('/artist/:id', getArtist);
 

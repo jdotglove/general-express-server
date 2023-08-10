@@ -5,9 +5,12 @@ import {
   getTrack,
   getTrackArtists,
   getTrackAudioFeatures,
+  searchForTrack,
 } from './handlers';
 
 const router = Router();
+
+router.post('/track/search', searchForTrack);
 
 router.get('/track/:id/audio-features', getTrackAudioFeatures);
 router.get('/track/:id/artists', getTrackArtists);
