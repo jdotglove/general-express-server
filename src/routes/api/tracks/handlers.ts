@@ -42,8 +42,7 @@ export const getSelectedTracks = async (req: any, res: any) => {
         headers: { Authorization: `Bearer ${req.query.token}` },
       });
       tracksArray.push(spotifyGetTracks.tracks);
-    }))
-    
+    }));
     res.status(200).send(tracksArray.flat()).end();
   } catch (error: any) {
     console.error('Error getting selected track: ', error.message);

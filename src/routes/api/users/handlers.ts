@@ -61,7 +61,7 @@ export const getUserPlaylists = async (req: any, res: any) => {
   try {
     const { data: spotifyUserPlaylists } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/me/playlists`,
+      url: `https://api.spotify.com/v1/me/playlists?limit=50`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
     const filteredPlaylists = spotifyUserPlaylists.items.filter((playlist: any) => playlist.owner.uri.endsWith(req.params.id));
@@ -77,7 +77,7 @@ export const createUserPlaylist = async (req: any, res: any) => {
   try {
     const { data: spotifyCreatePlaylist } = await axios({
       method: 'post',
-      url: `https://api.spotify.com/v1/users/${req.body.spotifyId}/playlists`,
+      url: `https://api.spotify.com/v1/users/${req.params.id}/playlists`,
       headers: { Authorization: `Bearer ${req.query.token}` },
       data: JSON.stringify({
         name: req.body.playlistName,
@@ -85,7 +85,7 @@ export const createUserPlaylist = async (req: any, res: any) => {
         description: req.body.playlistDescription,
       }),
     });
-    const { data: spotifyPlaylistAddItems } = await axios({
+    await axios({
       method: 'post',
       url: `https://api.spotify.com/v1/playlists/${spotifyCreatePlaylist.id}/tracks`,
       headers: { Authorization: `Bearer ${req.query.token}` },
