@@ -1,32 +1,21 @@
 import axios from '../../../plugins/axios';
 
-import {
-  findOneArtist,
-} from '../../../db/services/artist';
-import getOneUser from '../../../plugins/graphql/query/getOneUser';
-import {
-  graphQLRequest,
-} from '../../../plugins/graphql';
-import {
-  findOneUser,
-  findOneUserAndUpdate,
-  updateOneUser,
-  User,
-} from '../../../db/services/user';
 import { redisClientDo } from '../../../plugins/redis';
-import {
-  parseUriForId,
-  resolveArtistsInDatabase,
-  resolvePlaylistsInDatabase,
-  translateSpotifyTrackObject,
-  translateSpotifyUserObject,
-} from '../../../utils/spotify';
 import { Playlist } from '../../../db/services/playlist';
-import {
-  findOneTrack,
-  findOneTrackAndUpdate,
-} from '../../../db/services/track';
-import mongoose from '../../../plugins/mongoose';
+
+export const addToUserQueue = async (req: any, res: any) => {
+  try {
+    await axios({
+      method: 'post',
+      url: `https://api.spotify.com/v1/me/player/queue?uri=${req.body.trackUri}`,
+      headers: { Authorization: `Bearer ${req.query.token}` }
+    });
+    res.sendStatus(200).end();
+  } catch (error: any) {
+    res.status(500).send(error.message).end();
+  }
+  return;
+}
 
 export const getUserTopArtists = async (req: any, res: any) => {
   try {
