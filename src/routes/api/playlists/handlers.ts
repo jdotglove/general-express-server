@@ -1,11 +1,5 @@
 import axios from '../../../plugins/axios';
-import mongoose from '../../../plugins/mongoose';
-import getOnePlaylist from '../../../plugins/graphql/query/getOnePlaylist';
-import { parseUriForId, resolveTracksInDatabase } from '../../../utils/spotify';
-import { findOnePlaylist, Playlist } from '../../../db/services/playlist';
-import { graphQLRequest } from '../../../plugins/graphql';
-import { translateGQLDocument } from '../../../utils/graphql';
-import { redisClientDo } from '../../../plugins/redis';
+
 
 export const getPlaylistTracks = async (req: any, res: any) => {
   let playlist;

@@ -1,8 +1,7 @@
 import axios from '../../../plugins/axios';
 import mongoose from '../../../plugins/mongoose';
 import getOneTrack from '../../../plugins/graphql/query/getOneTrack';
-import { parseUriForId } from '../../../utils/spotify';
-import { findTracks, findOneTrackAndUpdate, findOneTrack, Track, updateOneTrack } from '../../../db/services/track';
+import { findOneTrack, Track } from '../../../db/services/track';
 import { graphQLRequest } from '../../../plugins/graphql';
 
 export const getTrack = async (req: any, res: any) => {
@@ -94,7 +93,7 @@ export const searchForTrack = async (req: any, res: any) => {
   try {
     const { data: spotifyTrackSearch } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/search?q=${encodeURI(req.body.query)}&type=${req.body.type}&limit=3`,
+      url: `https://api.spotify.com/v1/search?q=${encodeURI(req.body.query)}&type=${req.body.type}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
     const possibleTracks = spotifyTrackSearch.tracks.items;

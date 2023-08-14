@@ -1,9 +1,6 @@
 import axios from '../../../plugins/axios';
-import { formatSpotifyRecommendationRequest, parseUriForId } from '../../../utils/spotify';
-import { findOneArtist } from '../../../db/services/artist';
-import { graphQLRequest } from '../../../plugins/graphql';
-import { redisClientDo } from '../../../plugins/redis';
-import { findOneTrack } from '../../../db/services/track';
+import { formatSpotifyRecommendationRequest } from '../../../utils/spotify';
+
 
 export const generateRecommendations = async (req: any, res: any) => {
   let recommendation;

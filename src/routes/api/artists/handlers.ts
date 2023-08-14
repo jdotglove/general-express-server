@@ -1,10 +1,5 @@
 import axios from '../../../plugins/axios';
-import mongoose from '../../../plugins/mongoose';
-import getOneArtist from '../../../plugins/graphql/query/getOneArtist';
-import { parseUriForId, resolveTracksInDatabase } from '../../../utils/spotify';
-import { Artist, findOneArtist } from '../../../db/services/artist';
-import { graphQLRequest } from '../../../plugins/graphql';
-import { redisClientDo } from '../../../plugins/redis';
+
 
 export const getArtist = async (req: any, res: any) => {
   let artist;
@@ -27,7 +22,7 @@ export const searchForArtist = async (req: any, res: any) => {
   try {
     const { data: spotifyArtistSearch } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/search?q=${encodeURI(req.body.query)}&type=${req.body.type}&limit=3`,
+      url: `https://api.spotify.com/v1/search?q=${encodeURI(req.body.query)}&type=${req.body.type}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
     const possibleArtists = spotifyArtistSearch.artists.items;
