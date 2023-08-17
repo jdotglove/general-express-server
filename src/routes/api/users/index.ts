@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   addToUserQueue,
   createUserPlaylist,
+  getCurrentTrackBreakdown,
   getUserTopArtists,
   getUserTopTracks,
   getUserPlaylists,
@@ -12,6 +13,7 @@ import {
 const router = Router();
 
 router.get('/user/:id/playlists', getUserPlaylists);
+router.get('/user/:id/playback-state', getCurrentTrackBreakdown);
 router.get('/user/:id/top-artists', getUserTopArtists);
 router.get('/user/:id/top-tracks', getUserTopTracks);
 

@@ -13,8 +13,8 @@ export const getTrack = async (req: any, res: any) => {
     });
     res.status(200).send(spotifyGetTrack).end();
   } catch (error: any) {
-    console.error('Error retrieving track: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error retrieving track: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
   return;
 }
@@ -44,8 +44,8 @@ export const getSelectedTracks = async (req: any, res: any) => {
     }));
     res.status(200).send(tracksArray.flat()).end();
   } catch (error: any) {
-    console.error('Error getting selected track: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error getting selected track: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
   return;
 }
@@ -66,8 +66,8 @@ export const getTrackArtists = async (req: any, res: any) => {
     }
     
   } catch (error: any) {
-    console.error('Error retrieving tracks: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error retrieving tracks: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
 
   res.status(200).send().end();
@@ -83,8 +83,8 @@ export const getTrackAudioFeatures = async (req: any, res: any) => {
     });
     res.status(200).send(spotifyTracksAudioFeatures).end();
   } catch (error: any) {
-    console.error('Error retrieving audio features for track: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error retrieving audio features for track: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
   return;
 }
@@ -103,8 +103,8 @@ export const searchForTrack = async (req: any, res: any) => {
       res.status(200).send(possibleTracks).end();
     }
   } catch (error: any) {
-    console.error('Error searching for track', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error searching for track', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
   return;
 }

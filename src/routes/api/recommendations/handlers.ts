@@ -26,8 +26,8 @@ export const generateRecommendations = async (req: any, res: any) => {
       res.status(200).send(tracks).end();
     }
   } catch (error: any) {
-    console.error('Error retrieving recommendation: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error retrieving recommendation: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
   return;
 }
@@ -46,8 +46,8 @@ export const getSeedGenres = async (req: any, res: any) => {
       res.status(200).send(genres).end();
     }
   } catch (error: any) {
-    console.error('Error retrieving available recommendation seed genres: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error retrieving available recommendation seed genres: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
  return;
 }

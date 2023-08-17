@@ -13,8 +13,8 @@ export const getPlaylistTracks = async (req: any, res: any) => {
     res.status(200).send(trackObjArray).end();
 
   } catch (error: any) {
-    console.error('Error retrieving playlist tracks: ', error.message);
-    res.status(500).send(error.message).end();
+    console.error('Error retrieving playlist tracks: ', error.response.statusText);
+    res.status(error.response.status).send(error.response.statusText).end();
   }
 
   return;
