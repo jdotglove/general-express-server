@@ -9,11 +9,11 @@ export const getArtist = async (req: any, res: any) => {
       url: `https://api.spotify.com/v1/artists/${req.params.id}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyGetArtist);
+    res.status(200).send(spotifyGetArtist).end();
 
   } catch (error: any) {
-    console.error('Error retrieving artist: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving artist: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
@@ -32,8 +32,8 @@ export const searchForArtist = async (req: any, res: any) => {
       res.status(200).send(possibleArtists).end();
     }
   } catch (error: any) {
-    console.error('Error searching for artist', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error searching for artist', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
