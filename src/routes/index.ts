@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import discoveryApi from './api/discovery';
 import artistsApi from './api/artists';
 import playlistsApi from './api/playlists';
 import recommendationsApi from './api/recommendations';
@@ -13,6 +14,7 @@ const router = Router();
 
 // This section will help you get a list of all the records.
 router.use(secured, artistsApi);
+router.use(secured, discoveryApi);
 router.use(secured, playlistsApi);
 router.use(secured, recommendationsApi);
 router.use(secured, tracksApi);

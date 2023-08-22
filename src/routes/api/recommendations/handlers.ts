@@ -3,7 +3,6 @@ import { formatSpotifyRecommendationRequest } from '../../../utils/spotify';
 
 
 export const generateRecommendations = async (req: any, res: any) => {
-  let recommendation;
   try {
     const recPayload = req.body;
     recPayload.seed_artists = (await Promise.all(req.body.seed_artists.map(async (artistDBId: string) => {
@@ -26,8 +25,8 @@ export const generateRecommendations = async (req: any, res: any) => {
       res.status(200).send(tracks).end();
     }
   } catch (error: any) {
-    console.error('Error retrieving recommendation: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving recommendation: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
@@ -46,8 +45,8 @@ export const getSeedGenres = async (req: any, res: any) => {
       res.status(200).send(genres).end();
     }
   } catch (error: any) {
-    console.error('Error retrieving available recommendation seed genres: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving available recommendation seed genres: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
  return;
 }

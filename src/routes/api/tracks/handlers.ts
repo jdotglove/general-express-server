@@ -13,8 +13,8 @@ export const getTrack = async (req: any, res: any) => {
     });
     res.status(200).send(spotifyGetTrack).end();
   } catch (error: any) {
-    console.error('Error retrieving track: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving track: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
@@ -44,8 +44,8 @@ export const getSelectedTracks = async (req: any, res: any) => {
     }));
     res.status(200).send(tracksArray.flat()).end();
   } catch (error: any) {
-    console.error('Error getting selected track: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error getting selected track: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
@@ -64,10 +64,9 @@ export const getTrackArtists = async (req: any, res: any) => {
     } else {
       track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) });
     }
-    
   } catch (error: any) {
-    console.error('Error retrieving tracks: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving tracks: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || error.message).send(error.response?.statusText || error.message).end();
   }
 
   res.status(200).send().end();
@@ -83,8 +82,8 @@ export const getTrackAudioFeatures = async (req: any, res: any) => {
     });
     res.status(200).send(spotifyTracksAudioFeatures).end();
   } catch (error: any) {
-    console.error('Error retrieving audio features for track: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving audio features for track: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
@@ -103,8 +102,8 @@ export const searchForTrack = async (req: any, res: any) => {
       res.status(200).send(possibleTracks).end();
     }
   } catch (error: any) {
-    console.error('Error searching for track', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error searching for track', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }

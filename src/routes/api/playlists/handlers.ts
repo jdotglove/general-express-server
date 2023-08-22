@@ -2,7 +2,6 @@ import axios from '../../../plugins/axios';
 
 
 export const getPlaylistTracks = async (req: any, res: any) => {
-  let playlist;
   try {
     const { data: spotifyPlaylistTracks } = await axios({
       method: 'get',
@@ -13,8 +12,8 @@ export const getPlaylistTracks = async (req: any, res: any) => {
     res.status(200).send(trackObjArray).end();
 
   } catch (error: any) {
-    console.error('Error retrieving playlist tracks: ', error.response.statusText);
-    res.status(error.response.status).send(error.response.statusText).end();
+    console.error('Error retrieving playlist tracks: ', error.response?.statusText || error.message);
+    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
 
   return;
