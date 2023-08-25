@@ -14,7 +14,7 @@ export const generateRecommendations = async (req: any, res: any) => {
     })) || [])?.join(',');
     const { data: spotifyRecommendedTracks } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/recommendations?${formatSpotifyRecommendationRequest(recPayload).replaceAll('"', '')}`, //limit=10&market=EN&seed_tracks=2Byc1LTfTpxgn8WOyLMuOR
+      url: `https://api.spotify.com/v1/recommendations?${formatSpotifyRecommendationRequest(recPayload).replaceAll('"', '')}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
 
