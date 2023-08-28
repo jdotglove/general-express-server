@@ -1,6 +1,12 @@
 import axios from '../../../plugins/axios';
 
-
+/**
+ * @function getPlaylistTracks
+ * @param req 
+ * @member params.id - ID of playlist to find the tracks for
+ * @member query.token - Spotify auth token for the request
+ * @returns array of track objects
+ */
 export const getPlaylistTracks = async (req: any, res: any) => {
   try {
     const { data: spotifyPlaylistTracks } = await axios({

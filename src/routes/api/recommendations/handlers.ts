@@ -1,7 +1,15 @@
 import axios from '../../../plugins/axios';
 import { formatSpotifyRecommendationRequest } from '../../../utils/spotify';
 
-
+/**
+ * @function generateRecommendations
+ * @param req 
+ * @member body.seed_artists - artist ids used to seed recommendation
+ * @member body.seed_generes - genres used to seed recommendation
+ * @member body.seed_tracks - track ids used to seed recommendation
+ * @member body (remaining fields) - used to specify audio feature parameters for the recommendation
+ * @returns list of spotify tracks that fall into the recommendation pool (limit passed in on payload)
+ */
 export const generateRecommendations = async (req: any, res: any) => {
   try {
     const recPayload = req.body;
@@ -31,6 +39,12 @@ export const generateRecommendations = async (req: any, res: any) => {
   return;
 }
 
+/**
+ * @function getSeedGenres
+ * @param req 
+ * @member query.token - Spotify auth token for the request
+ * @returns array of genres available to be used for recommendation seeds
+ */
 export const getSeedGenres = async (req: any, res: any) => {
   try {
     const { data: spotifyAvailableGenreSeeds } = await axios({
