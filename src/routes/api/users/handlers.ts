@@ -1,9 +1,15 @@
 import axios from '../../../plugins/axios';
 
 import { redisClientDo } from '../../../plugins/redis';
-import { Playlist } from '../../../db/services/playlist';
 
-export const addToUserQueue = async (req: any, res: any) => {
+/**
+ * @function addToUserQueue
+ * @param req 
+ * @member body.trackUri - uri of track to add to the queue
+ * @member query.token - Spotify auth token for the request
+ * @returns Promise<void>
+ */
+export const addToUserQueue = async (req: any, res: any): Promise<void> => {
   try {
     await axios({
       method: 'post',
@@ -17,8 +23,21 @@ export const addToUserQueue = async (req: any, res: any) => {
   }
   return;
 }
-export const createUserPlaylist = async (req: any, res: any) => {
+
+/**
+ * @function createUserPlaylist
+ * @param req 
+ * @member query.token - Spotify auth token for the request
+ * @member params.id - Id of user to create the playlist for
+ * @member body.playlistName - name of the new playlist
+ * @member body.playlistDescription - description of the new playlist
+ * @member body.publicPlaylist - boolean for if playlist is public or not
+ * @member body.tracks - tracks to add to the newly created playlist
+ * @returns Promise<void>
+ */
+export const createUserPlaylist = async (req: any, res: any): Promise<void> => {
   try {
+    // Create playlist first
     const { data: spotifyCreatePlaylist } = await axios({
       method: 'post',
       url: `https://api.spotify.com/v1/users/${req.params.id}/playlists`,
@@ -29,6 +48,7 @@ export const createUserPlaylist = async (req: any, res: any) => {
         description: req.body.playlistDescription,
       }),
     });
+    // Then add tracks using the id for the response
     await axios({
       method: 'post',
       url: `https://api.spotify.com/v1/playlists/${spotifyCreatePlaylist.id}/tracks`,
@@ -43,7 +63,14 @@ export const createUserPlaylist = async (req: any, res: any) => {
   }
   return;
 }
-export const getCurrentTrackBreakdown = async (req: any, res: any) => {
+
+/**
+ * @function getCurrentTrackBreakdown
+ * @param req 
+ * @member query.token - Spotify auth token for the request
+ * @returns Promise<void>
+ */
+export const getCurrentTrackBreakdown = async (req: any, res: any): Promise<void> => {
   try {
     const { data: spotifyUserPlaybackState} = await axios({
       method: 'get',
@@ -104,6 +131,13 @@ export const getUserPlaylists = async (req: any, res: any) => {
   }
   return;
 }
+
+/**
+ * @function loginUser
+ * @param req 
+ * @member query.token - Spotify auth token to use for the request
+ * @returns spotify user object
+ */
 export const loginUser = async (req: any, res: any) => {
   try {
     const { data: spotifyUser } = await axios({
@@ -111,7 +145,6 @@ export const loginUser = async (req: any, res: any) => {
       url: 'https://api.spotify.com/v1/me',
       headers: { Authorization: `Bearer ${req.query.token}` }
     });
-    await redisClientDo('set', `${spotifyUser.uri}`, JSON.stringify(spotifyUser));
     res.status(200).send(spotifyUser).end();
   } catch (error: any) {
     console.error('Error Logging in user: ', error.response?.statusText || error.message);

@@ -1,42 +1,42 @@
 import axios from '../../../plugins/axios';
 
 /**
- * @function getPlaylist
+ * @function getAlbum
  * @param req 
- * @member params.id - ID of playlist to find
+ * @member params.id - ID of album to find
  * @member query.token - Spotify auth token for the request
- * @returns playlist object
+ * @returns album object
  */
- export const getPlaylist = async (req: any, res: any) => {
+ export const getAlbum = async (req: any, res: any) => {
   try {
-    const { data: spotifyPlaylist } = await axios({
+    const { data: spotifyAlbum } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/playlists/${req.params.id}`,
+      url: `https://api.spotify.com/v1/albums/${req.params.id}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyPlaylist).end();
+    res.status(200).send(spotifyAlbum).end();
   } catch (error: any) {
-    console.error('Error retrieving playlist: ', error.response?.statusText || error.message);
+    console.error('Error retrieving album: ', error.response?.statusText || error.message);
     res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;
 }
 
 /**
- * @function getPlaylistTracks
+ * @function getAlbumTracks
  * @param req 
- * @member params.id - ID of playlist to find the tracks for
+ * @member params.id - ID of album to find the tracks for
  * @member query.token - Spotify auth token for the request
  * @returns array of track objects
  */
-export const getPlaylistTracks = async (req: any, res: any) => {
+export const getAlbumTracks = async (req: any, res: any) => {
   try {
-    const { data: spotifyPlaylistTracks } = await axios({
+    const { data: spotifyAlbumTracks } = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/playlists/${req.params.id}/tracks`,
+      url: `https://api.spotify.com/v1/albums/${req.params.id}/tracks`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    const trackObjArray = spotifyPlaylistTracks.items.map((playlistTrack: any) => (playlistTrack.track))
+    const trackObjArray = spotifyAlbumTracks.items.map((albumTrack: any) => (albumTrack.track))
     res.status(200).send(trackObjArray).end();
   } catch (error: any) {
     console.error('Error retrieving playlist tracks: ', error.response?.statusText || error.message);

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from '../../../plugins/express';
 
 import {
   getNewReleases,
@@ -6,7 +6,7 @@ import {
   getCategoryPlaylists,
 } from './handlers';
 
-const router = Router();
+const router = express.Router();
 
 router.get('/discovery/new-releases', getNewReleases);
 router.get('/discovery/categories', getBrowsingCategories);

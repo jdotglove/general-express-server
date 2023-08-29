@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from '../../../plugins/express';
 
 import {
   addToUserQueue,
@@ -10,7 +10,7 @@ import {
   loginUser,
 } from './handlers';
 
-const router = Router();
+const router = express.Router();
 
 router.get('/user/:id/playlists', getUserPlaylists);
 router.get('/user/:id/playback-state', getCurrentTrackBreakdown);

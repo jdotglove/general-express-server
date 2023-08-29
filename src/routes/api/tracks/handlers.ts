@@ -4,6 +4,13 @@ import getOneTrack from '../../../plugins/graphql/query/getOneTrack';
 import { findOneTrack, Track } from '../../../db/services/track';
 import { graphQLRequest } from '../../../plugins/graphql';
 
+/**
+ * @function getTrack
+ * @param req
+ * @member query.token - spotify auth token for request
+ * @member params.id - track to be retrieved
+ * @returns selected track object
+ */
 export const getTrack = async (req: any, res: any) => {
   try {
     const { data: spotifyGetTrack } = await axios({
@@ -19,6 +26,11 @@ export const getTrack = async (req: any, res: any) => {
   return;
 }
 
+/**
+ * @function batchIds
+ * @param idArray array to be batched
+ * @returns Id array batched into groups of 50
+ */
 const batchIds = (idArray: Array<string>) => {
   let startIdx = 0;
   const batchLimit = 50;
@@ -30,6 +42,13 @@ const batchIds = (idArray: Array<string>) => {
   return batchedIdArray;
 }
 
+/**
+ * @function getSelectedTracks
+ * @param req 
+ * @member query.ids - Selected IDs of tracks to retrieve
+ * @member query.token - Spotify auth token for request
+ * @returns array of track objects
+ */
 export const getSelectedTracks = async (req: any, res: any) => {
   try {
     const idBatches = batchIds(req.query.ids)
@@ -50,29 +69,36 @@ export const getSelectedTracks = async (req: any, res: any) => {
   return;
 }
 
-export const getTrackArtists = async (req: any, res: any) => {
-  try {
-    let track;
-    if (process.env.NODE_ENV === 'development') {
-      const { data: { data } } = await graphQLRequest({
-        query: getOneTrack,
-        variables: {
-          trackId: req.params.id,
-        },
-      });
-      track = data.getOneTrack as Track;
-    } else {
-      track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) });
-    }
-  } catch (error: any) {
-    console.error('Error retrieving tracks: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || error.message).send(error.response?.statusText || error.message).end();
-  }
+// export const getTrackArtists = async (req: any, res: any) => {
+//   try {
+//     let track;
+//     if (process.env.NODE_ENV === 'development') {
+//       const { data: { data } } = await graphQLRequest({
+//         query: getOneTrack,
+//         variables: {
+//           trackId: req.params.id,
+//         },
+//       });
+//       track = data.getOneTrack as Track;
+//     } else {
+//       track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) });
+//     }
+//   } catch (error: any) {
+//     console.error('Error retrieving tracks: ', error.response?.statusText || error.message);
+//     res.status(error.response?.status || error.message).send(error.response?.statusText || error.message).end();
+//   }
 
-  res.status(200).send().end();
-  return;
-}
+//   res.status(200).send().end();
+//   return;
+// }
 
+/**
+ * 
+ * @param req
+ * @member params.id - ID of track to get audio features for
+ * @member query.token - Spotify auth token for request
+ * @returns track features object for the track
+ */
 export const getTrackAudioFeatures = async (req: any, res: any) => {
   try {
     const { data: spotifyTracksAudioFeatures } = await axios({
@@ -88,6 +114,13 @@ export const getTrackAudioFeatures = async (req: any, res: any) => {
   return;
 }
 
+/**
+ * @function searchForTrack
+ * @param req 
+ * @member body.query - track query to use for search
+ * @member body.type - type of item the search is for
+ * @returns possible found items that match the search query
+ */
 export const searchForTrack = async (req: any, res: any) => {
   try {
     const { data: spotifyTrackSearch } = await axios({

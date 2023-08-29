@@ -1,19 +1,19 @@
-import { Router } from 'express';
+import express from '../../../plugins/express';
 
 import {
   getSelectedTracks,
   getTrack,
-  getTrackArtists,
+  // getTrackArtists,
   getTrackAudioFeatures,
   searchForTrack,
 } from './handlers';
 
-const router = Router();
+const router = express.Router();
 
 router.post('/track/search', searchForTrack);
 
 router.get('/track/:id/audio-features', getTrackAudioFeatures);
-router.get('/track/:id/artists', getTrackArtists);
+// router.get('/track/:id/artists', getTrackArtists);
 router.get('/track/:id', getTrack);
 router.get('/track', getSelectedTracks);
 
