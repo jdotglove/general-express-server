@@ -1,15 +1,14 @@
 import express from '../../../plugins/express';
 
 import {
-  getArtist,
-  searchForArtist,
+    getAlbum,
+    getAlbumTracks,
 } from './handlers';
 
 const router = express.Router();
 
-router.post('/artist/search', searchForArtist);
-
-router.get('/artist/:id', getArtist);
+router.get('/album/:id/tracks', getAlbumTracks);
+router.get('/album/:id/', getAlbum);
 
 
 export default router;

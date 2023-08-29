@@ -77,7 +77,7 @@ export const getBrowsingCategories = async (req: any, res: any) => {
 
     res.status(200).send(categoryArray.flat()).end();
   } catch (error: any) {
-    console.error('Error getting browsing categories: ', error.response?.status || error.message);
+    console.error('Error getting browsing categories: ', error.response?.statusText || error.message);
     res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
   }
   return;

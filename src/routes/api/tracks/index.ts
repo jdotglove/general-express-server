@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from '../../../plugins/express';
 
 import {
   getSelectedTracks,
@@ -8,7 +8,7 @@ import {
   searchForTrack,
 } from './handlers';
 
-const router = Router();
+const router = express.Router();
 
 router.post('/track/search', searchForTrack);
 
