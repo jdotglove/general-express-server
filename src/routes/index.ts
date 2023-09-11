@@ -1,12 +1,12 @@
 import express from '../plugins/express';
 
-import albumsApi from './api/albums';
-import artistsApi from './api/artists';
-import discoveryApi from './api/discovery';
-import playlistsApi from './api/playlists';
-import recommendationsApi from './api/recommendations';
-import tracksApi from './api/tracks';
-import usersApi from './api/users';
+import albumsApi from './spotifyApi/albums';
+import artistsApi from './spotifyApi/artists';
+import discoveryApi from './spotifyApi/discovery';
+import playlistsApi from './spotifyApi/playlists';
+import recommendationsApi from './spotifyApi/recommendations';
+import tracksApi from './spotifyApi/tracks';
+import usersApi from './spotifyApi/users';
 import { secured } from '../middleware/authorization';
 
 const router = express.Router();
@@ -14,11 +14,11 @@ const router = express.Router();
 // General Routes
 
 // This section will help you get a list of all the records.
-router.use(secured, albumsApi);
-router.use(secured, artistsApi);
-router.use(secured, discoveryApi);
-router.use(secured, playlistsApi);
-router.use(secured, recommendationsApi);
-router.use(secured, tracksApi);
-router.use(secured, usersApi)
+router.use('/spotify', secured, albumsApi);
+router.use('/spotify', secured, artistsApi);
+router.use('/spotify', secured, discoveryApi);
+router.use('/spotify', secured, playlistsApi);
+router.use('/spotify', secured, recommendationsApi);
+router.use('/spotify', secured, tracksApi);
+router.use('/spotify', secured, usersApi)
 export default router;
