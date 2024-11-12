@@ -1,4 +1,6 @@
+import { SERVER_RESPONSE_CODES } from 'utils/constants';
 import axios from '../../../plugins/axios';
+import { Request, Response } from '../../../plugins/express';
 
 /**
  * @function getCategoryPlaylists
@@ -8,19 +10,26 @@ import axios from '../../../plugins/axios';
  * @member params.category - browsing category to fetch the playlists for
  * @returns array of category featured playlists
  */
-export const getCategoryPlaylists = async (req: any, res: any) => {
+export const getCategoryPlaylists = async (req: Request, res: Response) => {
   try {
     const limit = 16;
-    const offset = req.query.page === 1 ? 0 : req.query.page * limit;
+    const offset = JSON.parse(req.query?.page as string || "1" ) === 1 ? 0 : JSON.parse(req.query?.page as string || "1" ) * limit;
     const { data: spotifyCategoryPlaylists } = await axios({
       method: 'get',
       url: `https://api.spotify.com/v1/browse/categories/${req.params.category}/playlists?limit=${limit}&offset=${offset}`,
-      headers: { Authorization: `Bearer ${req.query.token}` }
+      headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyCategoryPlaylists.playlists.items).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyCategoryPlaylists.playlists.items).end();
   } catch (error: any) {
-    console.error('Error getting category playlists: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error getting category playlists: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
@@ -32,19 +41,26 @@ export const getCategoryPlaylists = async (req: any, res: any) => {
  * @member query.token - Spotify auth token to use for the request
  * @returns array of new releases
  */
-export const getNewReleases = async (req: any, res: any) => {
+export const getNewReleases = async (req: Request, res: Response) => {
   try {
-    const limit = 16
-    const offset = req.query.page === 1 ? 0 : req.query.page * limit
+    const limit = 16;
+    const offset = JSON.parse(req.query?.page as string || "1" ) ? 0 : JSON.parse(req.query?.page as string || "1" ) * limit;
     const { data: spotifyNewReleases } = await axios({
       method: 'get',
       url: `https://api.spotify.com/v1/browse/new-releases?limit=${limit}&offset=${offset}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyNewReleases.albums.items).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyNewReleases.albums.items).end();
   } catch (error: any) {
-    console.error('Error getting new releases: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error getting new releases: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
@@ -55,7 +71,7 @@ export const getNewReleases = async (req: any, res: any) => {
  * @member query.token - Spotify auth token to use for the request
  * @returns array of all browsing categories
  */
-export const getBrowsingCategories = async (req: any, res: any) => {
+export const getBrowsingCategories = async (req: Request, res: Response) => {
   try {
     const limit = 20;
     const categoryArray: Array<any> = [];
@@ -75,10 +91,17 @@ export const getBrowsingCategories = async (req: any, res: any) => {
       offset += limit;
     }
 
-    res.status(200).send(categoryArray.flat()).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(categoryArray.flat()).end();
   } catch (error: any) {
-    console.error('Error getting browsing categories: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error getting browsing categories: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }

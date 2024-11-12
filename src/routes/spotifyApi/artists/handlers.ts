@@ -1,4 +1,6 @@
+import { SERVER_RESPONSE_CODES } from 'utils/constants';
 import axios from '../../../plugins/axios';
+import { Request, Response } from '../../../plugins/express';
 
 /**
  * @function getArtist
@@ -7,17 +9,24 @@ import axios from '../../../plugins/axios';
  * @member params.id - ID of artist to be retrieved
  * @returns selected artist object
  */
-export const getArtist = async (req: any, res: any) => {
+export const getArtist = async (req: Request, res: Response) => {
   try {
     const { data: spotifyGetArtist } = await axios({
       method: 'get',
       url: `https://api.spotify.com/v1/artists/${req.params.id}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyGetArtist).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyGetArtist).end();
   } catch (error: any) {
-    console.error('Error retrieving artist: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error retrieving artist: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
@@ -30,7 +39,7 @@ export const getArtist = async (req: any, res: any) => {
  * @member params.id - artist to be retrieved
  * @returns selected artist object
  */
-export const searchForArtist = async (req: any, res: any) => {
+export const searchForArtist = async (req: Request, res: Response) => {
   try {
     const { data: spotifyArtistSearch } = await axios({
       method: 'get',
@@ -39,13 +48,20 @@ export const searchForArtist = async (req: any, res: any) => {
     });
     const possibleArtists = spotifyArtistSearch.artists.items;
     if (!possibleArtists) {
-      res.status(404).send('No artists found with this search query').end();
+      res.status(SERVER_RESPONSE_CODES.NOT_FOUND).send('No artists found with this search query').end();
     } else {
-      res.status(200).send(possibleArtists).end();
+      res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(possibleArtists).end();
     }
   } catch (error: any) {
-    console.error('Error searching for artist', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error searching for artist', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }

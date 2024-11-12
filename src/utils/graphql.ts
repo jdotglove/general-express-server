@@ -1,4 +1,4 @@
-import mongoose from '../plugins/mongoose';
+import mongoose from 'mongoose';
 
 export const translateGQLDocument = ({ Id, ...documentWithoutId }: {
   Id: mongoose.Types.ObjectId

@@ -1,7 +1,7 @@
-import { findOneAlbumAndUpdate } from '../db/services/album';
-import { findOneArtistAndUpdate } from '../db/services/artist';
-import { findOnePlaylistAndUpdate } from '../db/services/playlist';
-import { findOneTrackAndUpdate } from '../db/services/track';
+import { findOneAlbumAndUpdate } from '../db/audionest/services/album';
+import { findOneArtistAndUpdate } from '../db/audionest/services/artist';
+import { findOnePlaylistAndUpdate } from '../db/audionest/services/playlist';
+import { findOneTrackAndUpdate } from '../db/audionest/services/track';
 
 
 export const parseUriForId = (spotifyUri: string) => spotifyUri.split(':')[2];

@@ -1,8 +1,6 @@
+import { SERVER_RESPONSE_CODES } from 'utils/constants';
 import axios from '../../../plugins/axios';
-import mongoose from '../../../plugins/mongoose';
-import getOneTrack from '../../../plugins/graphql/query/getOneTrack';
-import { findOneTrack, Track } from '../../../db/services/track';
-import { graphQLRequest } from '../../../plugins/graphql';
+import { Request, Response } from '../../../plugins/express';
 
 /**
  * @function getTrack
@@ -11,17 +9,24 @@ import { graphQLRequest } from '../../../plugins/graphql';
  * @member params.id - track to be retrieved
  * @returns selected track object
  */
-export const getTrack = async (req: any, res: any) => {
+export const getTrack = async (req: Request, res: Response) => {
   try {
     const { data: spotifyGetTrack } = await axios({
       method: 'get',
       url: `https://api.spotify.com/v1/tracks/${req.params.id}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyGetTrack).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyGetTrack).end();
   } catch (error: any) {
-    console.error('Error retrieving track: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error retrieving track: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
@@ -49,9 +54,9 @@ const batchIds = (idArray: Array<string>) => {
  * @member query.token - Spotify auth token for request
  * @returns array of track objects
  */
-export const getSelectedTracks = async (req: any, res: any) => {
+export const getSelectedTracks = async (req: Request, res: Response) => {
   try {
-    const idBatches = batchIds(req.query.ids)
+    const idBatches = batchIds(req.query.ids as Array<string>)
     let tracksArray: Array<string | Array<string>> = []
     await Promise.all(idBatches.map(async (batchOfIds) => {
       const { data: spotifyGetTracks } = await axios({
@@ -61,36 +66,20 @@ export const getSelectedTracks = async (req: any, res: any) => {
       });
       tracksArray.push(spotifyGetTracks.tracks);
     }));
-    res.status(200).send(tracksArray.flat()).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(tracksArray.flat()).end();
   } catch (error: any) {
-    console.error('Error getting selected track: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error getting selected track: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
-
-// export const getTrackArtists = async (req: any, res: any) => {
-//   try {
-//     let track;
-//     if (process.env.NODE_ENV === 'development') {
-//       const { data: { data } } = await graphQLRequest({
-//         query: getOneTrack,
-//         variables: {
-//           trackId: req.params.id,
-//         },
-//       });
-//       track = data.getOneTrack as Track;
-//     } else {
-//       track = await findOneTrack({ _id: new mongoose.Types.ObjectId(req.params.id) });
-//     }
-//   } catch (error: any) {
-//     console.error('Error retrieving tracks: ', error.response?.statusText || error.message);
-//     res.status(error.response?.status || error.message).send(error.response?.statusText || error.message).end();
-//   }
-
-//   res.status(200).send().end();
-//   return;
-// }
 
 /**
  * 
@@ -99,17 +88,24 @@ export const getSelectedTracks = async (req: any, res: any) => {
  * @member query.token - Spotify auth token for request
  * @returns track features object for the track
  */
-export const getTrackAudioFeatures = async (req: any, res: any) => {
+export const getTrackAudioFeatures = async (req: Request, res: Response) => {
   try {
     const { data: spotifyTracksAudioFeatures } = await axios({
       method: 'get',
       url: `https://api.spotify.com/v1/audio-features/${req.params.id}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyTracksAudioFeatures).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyTracksAudioFeatures).end();
   } catch (error: any) {
-    console.error('Error retrieving audio features for track: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error retrieving audio features for track: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
@@ -121,7 +117,7 @@ export const getTrackAudioFeatures = async (req: any, res: any) => {
  * @member body.type - type of item the search is for
  * @returns possible found items that match the search query
  */
-export const searchForTrack = async (req: any, res: any) => {
+export const searchForTrack = async (req: Request, res: Response) => {
   try {
     const { data: spotifyTrackSearch } = await axios({
       method: 'get',
@@ -130,13 +126,20 @@ export const searchForTrack = async (req: any, res: any) => {
     });
     const possibleTracks = spotifyTrackSearch.tracks.items;
     if (!possibleTracks) {
-      res.status(404).send('No tracks found with this search query').end();
+      res.status(SERVER_RESPONSE_CODES.NOT_FOUND).send('No tracks found with this search query').end();
     } else {
-      res.status(200).send(possibleTracks).end();
+      res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(possibleTracks).end();
     }
   } catch (error: any) {
-    console.error('Error searching for track', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error searching for track', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
