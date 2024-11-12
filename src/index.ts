@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 });
 
 // start the Express server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`Server is running on port: ${PORT}`);
 });
 

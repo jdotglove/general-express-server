@@ -1,4 +1,6 @@
+import { SERVER_RESPONSE_CODES } from 'utils/constants';
 import axios from '../../../plugins/axios';
+import { Request, Response } from '../../../plugins/express';
 
 /**
  * @function getAlbum
@@ -7,17 +9,24 @@ import axios from '../../../plugins/axios';
  * @member query.token - Spotify auth token for the request
  * @returns album object
  */
- export const getAlbum = async (req: any, res: any) => {
+ export const getAlbum = async (req: Request, res: Response) => {
   try {
     const { data: spotifyAlbum } = await axios({
       method: 'get',
       url: `https://api.spotify.com/v1/albums/${req.params.id}`,
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(200).send(spotifyAlbum).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyAlbum).end();
   } catch (error: any) {
-    console.error('Error retrieving album: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error retrieving album: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }
@@ -29,7 +38,7 @@ import axios from '../../../plugins/axios';
  * @member query.token - Spotify auth token for the request
  * @returns array of track objects
  */
-export const getAlbumTracks = async (req: any, res: any) => {
+export const getAlbumTracks = async (req: Request, res: Response) => {
   try {
     const { data: spotifyAlbumTracks } = await axios({
       method: 'get',
@@ -37,10 +46,17 @@ export const getAlbumTracks = async (req: any, res: any) => {
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
     const trackObjArray = spotifyAlbumTracks.items.map((albumTrack: any) => (albumTrack.track))
-    res.status(200).send(trackObjArray).end();
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(trackObjArray).end();
   } catch (error: any) {
-    console.error('Error retrieving playlist tracks: ', error.response?.statusText || error.message);
-    res.status(error.response?.status || 500).send(error.response?.statusText || error.message).end();
+    const errorObj = error.response ? {
+      status: error.response.status,
+      message: error.response.statusText || error.message,
+    } : {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: error.message
+    };
+    console.error('Error retrieving playlist tracks: ', errorObj.message);
+    res.status(errorObj.status).send({ error: errorObj.message }).end();
   }
   return;
 }

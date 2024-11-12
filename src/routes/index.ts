@@ -1,12 +1,14 @@
 import express from '../plugins/express';
 
-import albumsApi from './spotifyApi/albums';
-import artistsApi from './spotifyApi/artists';
-import discoveryApi from './spotifyApi/discovery';
-import playlistsApi from './spotifyApi/playlists';
-import recommendationsApi from './spotifyApi/recommendations';
-import tracksApi from './spotifyApi/tracks';
-import usersApi from './spotifyApi/users';
+import spotifyAlbumsApi from './spotifyApi/albums';
+import spotifyArtistsApi from './spotifyApi/artists';
+import spotifyDiscoveryApi from './spotifyApi/discovery';
+import spotifyPlaylistsApi from './spotifyApi/playlists';
+import spotifyRecommendationsApi from './spotifyApi/recommendations';
+import spotifyTracksApi from './spotifyApi/tracks';
+import spotifyUsersApi from './spotifyApi/users';
+import alexAndAsherCustomerApi from './alexAndAsherApi/customers';
+import alexAndAsherManagementApi from './alexAndAsherApi/managment';
 import { secured } from '../middleware/authorization';
 
 const router = express.Router();
@@ -14,11 +16,14 @@ const router = express.Router();
 // General Routes
 
 // This section will help you get a list of all the records.
-router.use('/spotify', secured, albumsApi);
-router.use('/spotify', secured, artistsApi);
-router.use('/spotify', secured, discoveryApi);
-router.use('/spotify', secured, playlistsApi);
-router.use('/spotify', secured, recommendationsApi);
-router.use('/spotify', secured, tracksApi);
-router.use('/spotify', secured, usersApi)
+router.use('/spotify', secured, spotifyAlbumsApi);
+router.use('/spotify', secured, spotifyArtistsApi);
+router.use('/spotify', secured, spotifyDiscoveryApi);
+router.use('/spotify', secured, spotifyPlaylistsApi);
+router.use('/spotify', secured, spotifyRecommendationsApi);
+router.use('/spotify', secured, spotifyTracksApi);
+router.use('/spotify', secured, spotifyUsersApi);
+
+router.use('/alex-and-asher', secured, alexAndAsherCustomerApi);
+router.use('/alex-and-asher', secured, alexAndAsherManagementApi);
 export default router;

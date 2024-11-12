@@ -25,7 +25,9 @@
         "mongodb": "^5.5.0",
         "mongoose": "^7.2.0",
         "node-cache": "^5.1.2",
-        "redis": "^4.6.6"
+        "redis": "^4.6.6",
+        "stripe": "^17.2.1",
+        "uuid": "^10.0.0"
     },
     "devDependencies": {
         "@types/cors": "^2.8.13",
@@ -34,6 +36,7 @@
         "@types/helmet": "^4.0.0",
         "@types/node": "^20.1.0",
         "@types/node-cache": "^4.2.5",
+        "@types/uuid": "^10.0.0",
         "@types/webpack-node-externals": "^3.0.0",
         "concurrently": "^8.0.1",
         "nodemon": "^2.0.22",
