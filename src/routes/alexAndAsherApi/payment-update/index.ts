@@ -6,6 +6,6 @@ import {
 
 const router = express.Router();
 
-router.get('/payment-update/:updateAuthToken', verifyUpdateAuthToken);
+router.get('/payment-update', verifyUpdateAuthToken);
 
 export default router;
