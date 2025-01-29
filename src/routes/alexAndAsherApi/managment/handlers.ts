@@ -1,4 +1,4 @@
-import stripe from '../../../plugins/stripe';
+import Stripe from 'stripe';
 import { v4 as uuidv4 } from "uuid";
 
 import { SERVER_RESPONSE_CODES } from '../../../utils/constants';
@@ -15,6 +15,8 @@ import { AlexAndAsherError } from '../../../utils/errors';
  * @returns - a list of customers from the stripe account
  */
 export const fetchStripeCustomers = async (req: Request, res: Response) => {
+  const stripe = new Stripe(process.env.STRIPE_KEY as string);
+  
   try {
     const customers = await stripe.customers.list({ limit: 10 });
     res.status(SERVER_RESPONSE_CODES.ACCEPTED).send({ customers: customers.data }).end();

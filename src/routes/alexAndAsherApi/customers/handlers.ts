@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
+import Stripe from 'stripe';
 
-import stripe from '../../../plugins/stripe';
 import { SERVER_RESPONSE_CODES } from '../../../utils/constants';
 import { Request, Response } from '../../../plugins/express';
 import { findOnePaymentUpdateRequest } from "../../../db/alex-and-asher/services/payment-update-request";
@@ -16,6 +16,8 @@ import { findOneCustomer } from "../../../db/alex-and-asher/services/customer";
  * @returns - A boolean to indicate the payment method was updated
  */
 export const updateUserPaymentInformation = async (req: Request, res: Response) => {
+  const stripe = new Stripe(process.env.STRIPE_KEY as string);
+
   try {
     if (!req.params.customerId) {
       throw new AlexAndAsherError("Missing customer id", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
