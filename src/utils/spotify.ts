@@ -4,8 +4,6 @@ import { findOnePlaylistAndUpdate } from '../db/audionest/services/playlist';
 import { findOneTrackAndUpdate } from '../db/audionest/services/track';
 
 
-export const parseUriForId = (spotifyUri: string) => spotifyUri.split(':')[2];
-
 export const formatSpotifyRecommendationRequest = (
   recommendationPayload: Record<string, string | number | Array<string>>
 ) => {
