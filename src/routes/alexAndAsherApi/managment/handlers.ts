@@ -43,14 +43,12 @@ export const createUpdatePaymentRequest = async (req: Request, res: Response) =>
     }
 
     let targetCustomer;
-    console.log("Hello")
-    console.log(req.body.stripeId);
+
     targetCustomer = await findOneCustomer({
       stripeId: req.body.stripeId,
     });
-    console.log("Before", targetCustomer);
+
     if (!targetCustomer?._id) {
-      console.log("Here")
       targetCustomer = await createOneCustomer({
         createdAt: new Date(),
         email: req.body.email,
@@ -59,7 +57,7 @@ export const createUpdatePaymentRequest = async (req: Request, res: Response) =>
         updateAt: new Date(),
       });
     }
-    console.log("After", targetCustomer);
+
     if (targetCustomer?._id) {
       const uniqueId = uuidv4();
 

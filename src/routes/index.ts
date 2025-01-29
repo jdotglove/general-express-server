@@ -9,6 +9,7 @@ import spotifyTracksApi from './spotifyApi/tracks';
 import spotifyUsersApi from './spotifyApi/users';
 import alexAndAsherCustomerApi from './alexAndAsherApi/customers';
 import alexAndAsherManagementApi from './alexAndAsherApi/managment';
+
 import { secured } from '../middleware/authorization';
 
 const router = express.Router();
@@ -26,4 +27,5 @@ router.use('/spotify', secured, spotifyUsersApi);
 
 router.use('/alex-and-asher', secured, alexAndAsherCustomerApi);
 router.use('/alex-and-asher', secured, alexAndAsherManagementApi);
+
 export default router;
