@@ -1,6 +1,7 @@
 import { Request, Response } from '../../../plugins/express';
 import axios from '../../../plugins/axios';
-import { SERVER_RESPONSE_CODES } from 'utils/constants';
+import { SERVER_RESPONSE_CODES } from '../../../utils/constants';
+import { createUser, findOneUser } from '../../../db/audionest/services/user';
 
 /**
  * @function addToUserQueue
@@ -207,7 +208,22 @@ export const loginUser = async (req: Request, res: Response) => {
       url: 'https://api.spotify.com/v1/me',
       headers: { Authorization: `Bearer ${req.query.token}` },
     });
-    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(spotifyUser).end();
+
+    const foundUser = await findOneUser({ spotifyUri: spotifyUser.uri });
+
+    if (!foundUser?._id) {
+      const createdUser = await createUser({
+        spotifyUri: spotifyUser.uri,
+        spotifyId: spotifyUser.id,
+        displayName: spotifyUser.display_name,
+        email: spotifyUser.email,
+        images: spotifyUser.images,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      res.status(SERVER_RESPONSE_CODES.CREATED).send(createdUser).end();
+    }
+    res.status(SERVER_RESPONSE_CODES.ACCEPTED).send(foundUser).end();
   } catch (error: any) {
     const errorObj = error.response ? {
       status: error.response.status,

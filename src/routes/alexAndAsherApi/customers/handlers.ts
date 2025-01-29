@@ -12,7 +12,7 @@ import { findOneCustomer } from "../../../db/alex-and-asher/services/customer";
  * @function updateUserPaymentInformation
  * @param req
  * @member req.params.customerId - Id of customer to update,
- * @member req.body.paymentMethodId - Id of payment method to add to customer,
+ * @member req.body.paymentMethod - payment method to add to customer,
  * @returns - A boolean to indicate the payment method was updated
  */
 export const updateUserPaymentInformation = async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ export const updateUserPaymentInformation = async (req: Request, res: Response) 
       throw new AlexAndAsherError("Missing customer id", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
     }
 
-    if (!req.body.paymentMethodId) {
+    if (!req.body.paymentMethod?.id) {
       throw new AlexAndAsherError("Missing payment method id", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
     }
 
@@ -33,10 +33,11 @@ export const updateUserPaymentInformation = async (req: Request, res: Response) 
       throw new AlexAndAsherError(`Cannot find customer with id ${req.params.customerId} `, SERVER_RESPONSE_CODES.NOT_FOUND);
     }
 
-    const paymentMethod = await stripe.paymentMethods.attach(req.body.paymentMethodId, {
+    const paymentMethod = await stripe.paymentMethods.attach(req.body.paymentMethod.id, {
       customer: foundCustomer.stripeId, // Replace with the actual customer stripe ID
     });
 
+    
     // Set the default payment method for future payments
     await stripe.customers.update(foundCustomer.stripeId, {
       invoice_settings: {
@@ -89,7 +90,7 @@ export const verifyUpdateAuthToken = async (req: Request, res: Response) => {
     if (!foundRequest._id) {
       throw new AlexAndAsherError("Update request cannot be verified", SERVER_RESPONSE_CODES.NOT_FOUND);
     }
-    
+
     res.status(SERVER_RESPONSE_CODES.ACCEPTED).send({ verifiedCustomer: foundRequest.customerId }).end();
   } catch (error: any) {
     const errorObj = error.response ? {
