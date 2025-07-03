@@ -1,9 +1,14 @@
 export function secured(req: any, res: any, next: any) {
-  const auth = req.headers.authorization;
+  let auth = req.headers.authorization?.split(" ");
 
-  if (auth === process.env.API_KEY) {
+  if (auth && auth[0] === "Bearer" && auth[1] === process.env.API_KEY) {
     next();
   } else {
-    res.status(401).send('Access forbidden').end();
+    auth = req.headers.Authorization?.split(" ");
+    if (auth && auth[0] === "Bearer" && auth[1] === process.env.API_KEY) {
+      next();
+    } else {
+      res.status(401).send('Access forbidden').end();
+    }
   }
 };

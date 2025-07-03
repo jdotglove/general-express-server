@@ -10,6 +10,9 @@ import spotifyUsersApi from './spotifyApi/users';
 import alexAndAsherCustomerApi from './alexAndAsherApi/customers';
 import alexAndAsherManagementApi from './alexAndAsherApi/managment';
 import alexAndAsherMessageApi from './alexAndAsherApi/messages';
+import alexAndAsherInventoryApi from './alexAndAsherApi/inventory';
+import nestAdminApi from './nestApi/admin';
+import nestKnowledgeApi from './nestApi/knowledge';
 
 import { secured } from '../middleware/authorization';
 
@@ -29,6 +32,9 @@ router.use('/spotify', secured, spotifyUsersApi);
 router.use('/alex-and-asher', alexAndAsherMessageApi);
 router.use('/alex-and-asher', secured, alexAndAsherCustomerApi);
 router.use('/alex-and-asher', secured, alexAndAsherManagementApi);
+router.use('/alex-and-asher', secured, alexAndAsherInventoryApi);
 
+router.use('/nest', secured, nestAdminApi);
+router.use('/nest', secured, nestKnowledgeApi);
 
 export default router;
