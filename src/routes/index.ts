@@ -12,7 +12,7 @@ import alexAndAsherManagementApi from './alexAndAsherApi/managment';
 import alexAndAsherMessageApi from './alexAndAsherApi/messages';
 import alexAndAsherInventoryApi from './alexAndAsherApi/inventory';
 import nestAdminApi from './nestApi/admin';
-import nestKnowledgeApi from './nestApi/knowledge';
+import nestConversationApi from './nestApi/conversation';
 
 import { secured } from '../middleware/authorization';
 
@@ -35,6 +35,6 @@ router.use('/alex-and-asher', secured, alexAndAsherManagementApi);
 router.use('/alex-and-asher', secured, alexAndAsherInventoryApi);
 
 router.use('/nest', secured, nestAdminApi);
-router.use('/nest', secured, nestKnowledgeApi);
+router.use('/nest', secured, nestConversationApi);
 
 export default router;

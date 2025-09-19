@@ -1,5 +1,4 @@
 import webpack from 'webpack';
-import pathDev from 'path';
 import nodeExternalsDev from 'webpack-node-externals';
 
 module.exports = {

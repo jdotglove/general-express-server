@@ -21,7 +21,7 @@ export const adminLogin = async (req: Request, res: Response) => {
   let payload, statusCode;
   try {
     if (!req.body.username || !req.body.password) {
-      throw new NestError("Username and password are required", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
+      throw new NestError("Username and password are required", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
 
     const foundUser = await findOneUser({
@@ -34,7 +34,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     if (foundUser && bcryptMatch) {
       const token = jwt.sign({
         createdAt: createdAtDate,
-        id: foundUser._id,
+        userId: foundUser._id,
       }, `${process.env.JWT_SECRET_KEY}`, {
         expiresIn: "2 hours",
       });
@@ -81,13 +81,13 @@ export const createAdmin = async (req: Request, res: Response) => {
   let payload, statusCode;
   try {
     if (!req.body.username || !req.body.password) {
-      throw new Error("Username and password are required");
+      throw new NestError("Username and password are required", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
-    console.log("Creating Admin: ", req.body);
+
     const createdAtDate = new Date();
     if (typeof saltRounds === "number") {
       bcrypt.hash(req.body.password, saltRounds).then(async function (hash) {
-        const createdUser = await createUser({
+        await createUser({
           username: req.body.username,
           password: hash,
           createdAt: new Date(createdAtDate),
@@ -105,12 +105,12 @@ export const createAdmin = async (req: Request, res: Response) => {
       status: error.response.status,
       message: error.response.statusText || error.message,
     } : {
-      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      status: error.statusCode || SERVER_RESPONSE_CODES.SERVER_ERROR,
       message: error.message,
     };
     statusCode = errorObj.status;
     payload = { message: errorObj.message };
-    console.error(`Error creating admin ${req.params.taskId}`, errorObj.message);
+    console.error(`Error creating admin: ${JSON.stringify(errorObj)}`);
   } finally {
     res.status(statusCode).send(payload).end();
   }
