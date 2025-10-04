@@ -18,11 +18,11 @@ import { findOneCustomer } from "../../../db/alex-and-asher/services/customer";
 export const updateUserPaymentInformation = async (req: Request, res: Response) => {
   try {
     if (!req.params.customerId) {
-      throw new AlexAndAsherError("Missing customer id", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
+      throw new AlexAndAsherError("Missing customer id", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
 
     if (!req.body.paymentMethod?.id) {
-      throw new AlexAndAsherError("Missing payment method id", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
+      throw new AlexAndAsherError("Missing payment method id", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
 
     const foundCustomer = await findOneCustomer({
@@ -67,11 +67,11 @@ export const updateUserPaymentInformation = async (req: Request, res: Response) 
 export const verifyUpdateAuthToken = async (req: Request, res: Response) => {
   try {
     if (!req.query.token) {
-      throw new AlexAndAsherError("Missing Update Auth Token", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
+      throw new AlexAndAsherError("Missing Update Auth Token", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
 
     if (!req.query.email) {
-      throw new AlexAndAsherError("Missing Verification Email", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
+      throw new AlexAndAsherError("Missing Verification Email", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
 
     const foundCustomer = await findOneCustomer({

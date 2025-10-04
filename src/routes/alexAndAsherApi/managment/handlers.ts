@@ -39,7 +39,7 @@ export const fetchStripeCustomers = async (req: Request, res: Response) => {
 export const createUpdatePaymentRequest = async (req: Request, res: Response) => {
   try {
     if (!req.body.stripeId) {
-      throw new AlexAndAsherError("Missing StripeId", SERVER_RESPONSE_CODES.BAD_PAYLOAD);
+      throw new AlexAndAsherError("Missing StripeId", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
 
     let targetCustomer;
