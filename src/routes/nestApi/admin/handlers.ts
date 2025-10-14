@@ -30,7 +30,7 @@ export const adminLogin = async (req: Request, res: Response) => {
 
     const bcryptMatch = await bcrypt.compare(req.body.password, foundUser?.password);
     const createdAtDate = dayjs();
-
+  console.log(bcryptMatch, req.body.password, foundUser?.password)
     if (foundUser && bcryptMatch) {
       const token = jwt.sign({
         createdAt: createdAtDate,
