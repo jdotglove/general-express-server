@@ -27,10 +27,11 @@ export const adminLogin = async (req: Request, res: Response) => {
     const foundUser = await findOneUser({
       username: req.body.username,
     });
+    console.log(req.body.username, req.body.password, foundUser?.password)
 
     const bcryptMatch = await bcrypt.compare(req.body.password, foundUser?.password);
     const createdAtDate = dayjs();
-  console.log(bcryptMatch, req.body.password, foundUser?.password, process.env.JWT_SECRET_KEY)
+  
     if (foundUser && bcryptMatch) {
       const token = jwt.sign({
         createdAt: createdAtDate,
