@@ -19,7 +19,13 @@ const server = createServer(app);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(helmet());
-app.use(cors());
+// Enhanced CORS configuration
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Upgrade', 'Connection'],
+}));
 app.use(express.json());
 app.use(router);
 
@@ -32,6 +38,12 @@ app.get('/', (_req, res) => {
 const wss = new WebSocketServer({ 
   server,
   path: '/ws',
+  verifyClient: (info: { origin: any; }) => {
+    // Add origin verification for production
+    const origin = info.origin;
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['*'];
+    return allowedOrigins.includes('*') || allowedOrigins.includes(origin);
+  },
 });
 
 // Handle WebSocket connections
