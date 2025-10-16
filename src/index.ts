@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import { RawData, WebSocketServer } from 'ws';
+import { createServer } from 'http';
 
 import router from './routes';
 import { knowledgeBot } from './services/knowledge';
@@ -13,6 +14,8 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5054;
 const app = express();
+
+const server = createServer(app);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(helmet());
@@ -24,13 +27,12 @@ app.get('/', (_req, res) => {
   res.send('Hello from App Engine!');
 });
 
-// start the Express server
-const server = app.listen(PORT, async () => {
-  console.log(`Server is running on port: ${PORT}`);
-});
 
 // Attach WebSocket server to the HTTP server
-const wss = new WebSocketServer({ server, path: '/ws' });
+const wss = new WebSocketServer({ 
+  server,
+  path: '/ws',
+});
 
 // Handle WebSocket connections
 wss.on('connection', (ws) => {
@@ -50,6 +52,10 @@ function shutdown() {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
+
+app.listen(PORT, async () => {
+  console.log(`Server is running on port: ${PORT}`);
+});
 
 /**
  * Webpack HMR Activation
