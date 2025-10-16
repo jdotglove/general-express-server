@@ -50,10 +50,15 @@ function shutdown() {
   process.exit(0);
 }
 
+// optional: see upgrade attempts
+server.on('upgrade', (req) => {
+  console.log('HTTP upgrade', { url: req.url, origin: req.headers.origin });
+});
+
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   console.log(`Server is running on port: ${PORT}`);
 });
 
