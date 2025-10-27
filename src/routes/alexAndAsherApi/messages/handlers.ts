@@ -4,7 +4,6 @@ import twilio from "twilio";
 
 export const processIncomingMessage = async (req: Request, res: Response) => {
   try {
-    console.log(req.body);
     const twiml = new twilio.twiml.MessagingResponse();
 
     res.type('text/xml').send(twiml.toString()).end();
