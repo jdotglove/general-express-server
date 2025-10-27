@@ -1,13 +1,13 @@
-import express from '../../../plugins/express';
+import express from "../../../plugins/express";
 
 import {
     adminLogin,
     createAdmin,
-} from './handlers';
+} from "./handlers";
 
 const router = express.Router();
 
-router.post('/admin/login', adminLogin);
-router.post('/admin/create', createAdmin);
+router.post("/admin/login", adminLogin);
+router.post("/admin/create", createAdmin);
 
 export default router;

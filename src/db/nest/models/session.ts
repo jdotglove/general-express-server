@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { nestDBConnection } from '../../../plugins/mongoose';
+import { nestDBConnection } from "../../../plugins/mongoose";
 
 const { Schema } = mongoose;
 
@@ -36,8 +36,8 @@ const SessionSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: 'User',
+    ref: "User",
   }
 });
 
-export const SessionModel = nestDBConnection.model<SessionDocument>('Session', SessionSchema);
+export const SessionModel = nestDBConnection.model<SessionDocument>("Session", SessionSchema);

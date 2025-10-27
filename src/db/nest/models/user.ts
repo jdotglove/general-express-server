@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { nestDBConnection } from '../../../plugins/mongoose';
+import { nestDBConnection } from "../../../plugins/mongoose";
 
 const { Schema } = mongoose;
 
@@ -28,4 +28,4 @@ const UserSchema = new Schema({
   },
 });
 
-export const UserModel = nestDBConnection.model<UserDocument>('User', UserSchema);
+export const UserModel = nestDBConnection.model<UserDocument>("User", UserSchema);

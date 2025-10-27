@@ -67,6 +67,7 @@ export const knowledgeBot = async (message: string, userId: string, conversation
       createdAt: new Date(), 
       sender: "bot",
       conversation: new mongoose.Types.ObjectId(conversationId),
+      modelUsed: MODEL_MAPPING["general"].model,
     });
     return response;
   } catch (error: unknown) {

@@ -27,8 +27,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     const foundUser = await findOneUser({
       username: req.body.username,
     });
-    console.log(req.body.username, req.body.password, foundUser?.password)
-
+    
     const bcryptMatch = await bcrypt.compare(req.body.password, foundUser?.password);
     const createdAtDate = dayjs();
   

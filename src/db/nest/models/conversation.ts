@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { nestDBConnection } from '../../../plugins/mongoose';
+import { nestDBConnection } from "../../../plugins/mongoose";
 
 const { Schema } = mongoose;
 
@@ -30,13 +30,13 @@ const ConversationSchema = new Schema({
   },
   lastMessage: {
     type: Schema.Types.ObjectId,
-    ref: 'Message',
+    ref: "Message",
   },
   user: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: 'User',
+    ref: "User",
   }
 });
 
-export const ConversationModel = nestDBConnection.model<ConversationDocument>('Conversation', ConversationSchema);
+export const ConversationModel = nestDBConnection.model<ConversationDocument>("Conversation", ConversationSchema);

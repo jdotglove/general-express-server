@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { nestDBConnection } from '../../../plugins/mongoose';
+import { nestDBConnection } from "../../../plugins/mongoose";
 
 const { Schema } = mongoose;
 
@@ -11,6 +11,7 @@ export interface MessageDocument extends mongoose.Document {
   createdAt: Date;
   sender: string;
   user: mongoose.Types.ObjectId;
+  modelUsed: string;
 }
 
 const MessageSchema = new Schema({
@@ -20,7 +21,7 @@ const MessageSchema = new Schema({
   },
   conversation: {
     type: Schema.Types.ObjectId,
-    ref: 'Conversation',
+    ref: "Conversation",
     required: true,
   },
   createdAt: {
@@ -30,14 +31,18 @@ const MessageSchema = new Schema({
   },
   sender: {
     type: String,
-    enum: ['user', 'bot'],
+    enum: ["user", "bot"],
     required: true,
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
+    required: false,
+  },
+  modelUsed: {
+    type: String,
     required: false,
   },
 });
 
-export const MessageModel = nestDBConnection.model<MessageDocument>('Message', MessageSchema);
+export const MessageModel = nestDBConnection.model<MessageDocument>("Message", MessageSchema);
