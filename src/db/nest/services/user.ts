@@ -10,8 +10,10 @@ export const createUser = (
 
 export const findOneUser = (
   query: any,
+  projection?: any,
   options?: any,
 ): Promise<User> => UserModel.findOne(
   query,
+  projection,
   options,
 ) as unknown as Promise<User>;

@@ -44,6 +44,7 @@ export const getAllConversations = async (req: Request, res: Response) => {
  * @member body.name - Name of the new conversation
  */
 export const createNewConversation = async (req: Request, res: Response) => {
+  let payload, statusCode;
   try {
     console.log("Creating new conversation with body: ", req.body);
     if (!req.body.userId || !req.body.name) {
@@ -62,6 +63,8 @@ export const createNewConversation = async (req: Request, res: Response) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    statusCode = SERVER_RESPONSE_CODES.CREATED;
+    payload = { success: true, message: "Conversation created successfully" };
   } catch (error: any) {
     const errorObj = error.response ? {
       status: error.response.status,
@@ -70,9 +73,10 @@ export const createNewConversation = async (req: Request, res: Response) => {
       status: error.statusCode || SERVER_RESPONSE_CODES.SERVER_ERROR,
       message: error.message,
     };
-    const statusCode = errorObj.status;
-    const payload = { message: errorObj.message };
+    statusCode = errorObj.status;
+    payload = { message: errorObj.message };
     console.error(`Error creating conversation: ${JSON.stringify(errorObj)}`);
+  } finally {
     res.status(statusCode).send(payload).end();
   }
 }
