@@ -4,8 +4,7 @@ import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 
 import { Request, Response } from "../../../plugins/express";
-import { SERVER_RESPONSE_CODES } from "../../../utils/constants";
-import { NestError } from "../../../utils/errors";
+import { NestError, SERVER_RESPONSE_CODES } from "../../../utils/errors";
 import { createUser, findOneUser } from "../../../db/nest/services/user";
 import { createSession } from "../../../db/nest/services/session";
 
@@ -64,7 +63,7 @@ export const adminLogin = async (req: Request, res: Response) => {
       message: error.message,
     };
     statusCode = errorObj.status;
-    payload = { message: errorObj.message };
+    payload = { message: "Error logging in admin!" };
     console.error(`Error logging in admin: ${JSON.stringify(errorObj)}`);
   } finally {
     res.status(statusCode).send(payload).end();
@@ -109,7 +108,7 @@ export const createAdmin = async (req: Request, res: Response) => {
       message: error.message,
     };
     statusCode = errorObj.status;
-    payload = { message: errorObj.message };
+    payload = { message: "Error creating admin account!" };
     console.error(`Error creating admin: ${JSON.stringify(errorObj)}`);
   } finally {
     res.status(statusCode).send(payload).end();

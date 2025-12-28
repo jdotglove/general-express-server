@@ -8,9 +8,9 @@ export interface OrchestrationEventDocument extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
   conversation: mongoose.Types.ObjectId;
   createdAt: Date;
-  selectedModel: string;
+  personaRanking: string;
   user: mongoose.Types.ObjectId;
-  tags: string[];
+  personaMappingSnapshot: string;
   triggerMessage: string;
 }
 
@@ -25,7 +25,7 @@ const OrchestrationEventSchema = new Schema({
     required: true,
     default: new Date(),
   },
-  selectedModel: {
+  personaMappingSnapshot: {
     type: String,
     required: true,
   },
@@ -34,9 +34,8 @@ const OrchestrationEventSchema = new Schema({
     required: true,
     ref: "User",
   },
-  tags: {
-    type: Array,
-    of: String,
+  personaRanking: {
+    type: String,
     required: true,
   },
   triggerMessage: {

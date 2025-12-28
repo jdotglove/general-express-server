@@ -1,4 +1,4 @@
-import { SERVER_RESPONSE_CODES } from 'utils/constants';
+import { SERVER_RESPONSE_CODES } from '../../../utils/errors';
 import axios from '../../../plugins/axios';
 import { Request, Response } from '../../../plugins/express';
 

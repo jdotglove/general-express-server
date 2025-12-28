@@ -1,11 +1,10 @@
 import stripe from '../../../plugins/stripe';
 import { v4 as uuidv4 } from "uuid";
 
-import { SERVER_RESPONSE_CODES } from '../../../utils/constants';
 import { Request, Response } from '../../../plugins/express';
 import { createOneCustomer, findOneCustomer } from '../../../db/alex-and-asher/services/customer';
 import { createOnePaymentUpdateRequest } from '../../../db/alex-and-asher/services/payment-update-request';
-import { AlexAndAsherError } from '../../../utils/errors';
+import { AlexAndAsherError, SERVER_RESPONSE_CODES } from '../../../utils/errors';
 
 /**
  * @function fetchStripeCustomers

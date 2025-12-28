@@ -1,7 +1,7 @@
-import { Request, Response } from '../../../plugins/express';
-import axios from '../../../plugins/axios';
-import { SERVER_RESPONSE_CODES } from '../../../utils/constants';
-import { createUser, findOneUser } from '../../../db/audionest/services/user';
+import { Request, Response } from "../../../plugins/express";
+import axios from "../../../plugins/axios";
+import { SERVER_RESPONSE_CODES } from "../../../utils/errors";
+import { createUser, findOneUser } from "../../../db/audionest/services/user";
 
 /**
  * @function addToUserQueue

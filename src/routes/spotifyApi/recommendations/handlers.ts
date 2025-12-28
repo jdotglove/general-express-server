@@ -1,7 +1,7 @@
 import axios from '../../../plugins/axios';
 import { formatSpotifyRecommendationRequest } from '../../../utils/spotify';
 import { Request, Response } from '../../../plugins/express';
-import { SERVER_RESPONSE_CODES } from 'utils/constants';
+import { SERVER_RESPONSE_CODES } from '../../../utils/errors';
 
 /**
  * @function generateRecommendations

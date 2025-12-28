@@ -2,10 +2,10 @@ import "dotenv/config";
 import mongoose from "mongoose";
 
 import { Request, Response } from "../../../plugins/express";
-import { SERVER_RESPONSE_CODES } from "../../../utils/constants";
+import {  } from "../../../utils/constants";
 import { findManyConversations, createConversation } from "../../../db/nest/services/conversation";
 import { findOneUser } from "../../../db/nest/services/user";
-import { NestError } from "../../../utils/errors";
+import { NestError, SERVER_RESPONSE_CODES } from "../../../utils/errors";
 import { findManyMessages } from "../../../db/nest/services/message";
 
 /**
@@ -30,8 +30,8 @@ export const getAllConversations = async (req: Request, res: Response) => {
       message: error.message,
     };
     statusCode = errorObj.status;
-    payload = { message: errorObj.message };
-    console.error(`Error logging in admin: ${JSON.stringify(errorObj)}`);
+    payload = { message: "Error getting all conversations!" };
+    console.error(`Error getting all conversations: ${JSON.stringify(errorObj)}`);
   } finally {
     res.status(statusCode).send(payload).end();
   }
@@ -74,7 +74,7 @@ export const createNewConversation = async (req: Request, res: Response) => {
       message: error.message,
     };
     statusCode = errorObj.status;
-    payload = { message: errorObj.message };
+    payload = { message: "Error creating conversation!" };
     console.error(`Error creating conversation: ${JSON.stringify(errorObj)}`);
   } finally {
     res.status(statusCode).send(payload).end();
@@ -102,8 +102,8 @@ export const getConversationMessages = async (req: Request, res: Response) => {
       message: error.message,
     };
     const statusCode = errorObj.status;
-    const payload = { message: errorObj.message };
-    console.error(`Error get conversation messages: ${JSON.stringify(errorObj)}`);
+    const payload = { message: "Error getting conversation messages!" };
+    console.error(`Error getting conversation messages: ${JSON.stringify(errorObj)}`);
     res.status(statusCode).send(payload).end();
   }
 }

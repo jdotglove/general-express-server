@@ -31,7 +31,6 @@ const MessageSchema = new Schema({
   },
   sender: {
     type: String,
-    enum: ["user", "bot"],
     required: true,
   },
   user: {

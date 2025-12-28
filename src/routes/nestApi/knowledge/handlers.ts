@@ -27,7 +27,11 @@ export const handleMessageStreaming = async (req: Request, res: Response) => {
       "Access-Control-Allow-Headers": "Cache-Control"
     });
     // Send initial connection confirmation
-    res.write(JSON.stringify({ "data": { "type": "status", "status": "connected", "timestamp": `${Date.now()}` } } ) + "\n");
+    res.write(JSON.stringify({ "data": { 
+      "type": "status", 
+      "status": "connected", 
+      "timestamp": `${Date.now()}`,
+    }}) + "\n");
 
     await createMessage({ 
       body: message, 
@@ -48,12 +52,25 @@ export const handleMessageStreaming = async (req: Request, res: Response) => {
       message,
       conversationId,
     );
+
+    knowledgeResponse.forEach((agentPersonaResponse) => {
+      res.write(JSON.stringify({ "data": {  
+        "type": "message", 
+        "message": agentPersonaResponse.message,
+        "personaName": agentPersonaResponse.personaName,
+        "conversationId": `${conversationId}`, 
+        "timestamp": `${Date.now()}`,
+      }}) + "\n");
+    });
     
-    res.write(JSON.stringify({ "data": {  "type": "message", "message": `${knowledgeResponse}`, "conversationId": `${conversationId}`, "timestamp": `${Date.now()}` } }) + "\n");
-    res.write(JSON.stringify({ "data": { "type": "status", "status": "completed", "timestamp": `${Date.now()}` } } ));
+    res.write(JSON.stringify({ "data": { 
+      "type": "status", 
+      "status": "completed", 
+      "timestamp": `${Date.now()}`,
+    }}));
     res.end();
   } catch (error) {
     console.error(`Message processing error: ${error}`);
-    res.status(500).json({ error: "Message processing failed" });
+    res.status(500).json({ error: "Message processing failed" }).end();
   }
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "../../../plugins/express";
-import { SERVER_RESPONSE_CODES } from "../../../utils/constants";
+import { SERVER_RESPONSE_CODES } from "../../../utils/errors";
 import twilio from "twilio";
 
 export const processIncomingMessage = async (req: Request, res: Response) => {

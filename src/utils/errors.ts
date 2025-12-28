@@ -29,3 +29,11 @@ export class NestError extends Error {
     this.name = this.constructor.name;
   }
 }
+
+export const enum SERVER_RESPONSE_CODES {
+  ACCEPTED = 200,
+  CREATED = 201,
+  NOT_FOUND = 404,
+  BAD_REQUEST = 400,
+  SERVER_ERROR = 500,
+}
