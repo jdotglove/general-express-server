@@ -4,21 +4,17 @@ import { nestDBConnection } from "../../../plugins/mongoose";
 
 const { Schema } = mongoose;
 
-export interface MessageDocument extends mongoose.Document {
+export interface OrchestrationEventDocument extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
-  body: string;
   conversation: mongoose.Types.ObjectId;
   createdAt: Date;
-  sender: string;
+  personaRanking: string;
   user: mongoose.Types.ObjectId;
-  modelUsed: string;
+  personaMappingSnapshot: string;
+  triggerMessage: string;
 }
 
-const MessageSchema = new Schema({
-  body: {
-    type: String,
-    required: true,
-  },
+const OrchestrationEventSchema = new Schema({
   conversation: {
     type: Schema.Types.ObjectId,
     ref: "Conversation",
@@ -29,19 +25,23 @@ const MessageSchema = new Schema({
     required: true,
     default: new Date(),
   },
-  sender: {
+  personaMappingSnapshot: {
     type: String,
     required: true,
   },
   user: {
     type: Schema.Types.ObjectId,
+    required: true,
     ref: "User",
-    required: false,
   },
-  modelUsed: {
+  personaRanking: {
     type: String,
-    required: false,
+    required: true,
+  },
+  triggerMessage: {
+    type: String,
+    required: true,
   },
 });
 
-export const MessageModel = nestDBConnection.model<MessageDocument>("Message", MessageSchema);
+export const OrchestrationEventModel = nestDBConnection.model<OrchestrationEventDocument>("OrchestrationEvent", OrchestrationEventSchema);

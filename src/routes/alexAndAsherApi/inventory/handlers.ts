@@ -1,4 +1,4 @@
-import { SERVER_RESPONSE_CODES } from '../../../utils/constants';
+import { SERVER_RESPONSE_CODES } from '../../../utils/errors';
 import { Request, Response } from '../../../plugins/express';
 import axios from '../../../plugins/axios';
 
@@ -18,7 +18,6 @@ export const getInventoryItems = async (req: Request, res: Response) => {
       },
     });
 
-    console.log(inventoryResopnse.data);
     const inventoryItems = inventoryResopnse.data.data.map((inventoryItem: any) => {
       return {
         squaraeProductUID: inventoryItem.product_uid,

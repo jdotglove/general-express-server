@@ -10,26 +10,28 @@ export const createSession = (
 
 export const findOneSession = (
   query: any,
+  projection?: any,
   options?: any,
 ): Promise<Session> => SessionModel.findOne(
   query,
+  projection,
   options,
 ) as unknown as Promise<Session>;
 
 export const findOneSessionAndUpdate = (
-    query: any,
-    update: any,
-    options?: any,
+  query: any,
+  update: any,
+  options?: any,
 ): Promise<Session> => SessionModel.findOneAndUpdate(
-    query,
-    update,
-    options,
+  query,
+  update,
+  options,
 ) as unknown as Promise<Session>;
 
 export const updateOneSession = (
-    query: any,
-    options?: any,
-  ): Promise<void> => SessionModel.updateOne(
-    query,
-    options,
-  ) as unknown as Promise<void>;
+  query: any,
+  update: any,
+): Promise<void> => SessionModel.updateOne(
+  query,
+  update,
+) as unknown as Promise<void>;

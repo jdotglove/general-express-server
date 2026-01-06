@@ -29,7 +29,7 @@ const ConversationSchema = new Schema({
     default: new Date(),
   },
   lastMessage: {
-    type: Schema.Types.ObjectId,
+    type: String,
     ref: "Message",
   },
   user: {
