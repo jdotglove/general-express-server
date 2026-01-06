@@ -1,32 +1,50 @@
+import { CouncilMember } from "../../db/nest/services/council-member";
 import Langchain, { ToolCallType, BaseMessageType } from "../../plugins/langchain";
-// import retrieve from "../utils/retrieval";
+import { NestError, SERVER_RESPONSE_CODES } from "../../utils/errors";
 
-/**
- * @function SolitaryAphoristicNomad
- * @param messages 
- * @returns A langgraph task that invokes the Solitary Aphoristic Nomad
- * @description 
- *  The "Solitary Aphoristic Nomad" (Nietzsche):
- *    - "Solitary" reflects his philosophical isolation
- *    - "Aphoristic" highlights his unique, concise writing style
- *    - "Nomad" symbolizes his intellectual wandering and challenge to established thought
- */
-export const SolitaryAphoristicNomad = ({
-  messageArray, 
+const SUPPORTED_OPENAI_MODELS = [
+  "gpt-5.2-chat-latest", 
+  "gpt-5.1-chat-latest", 
+  "gpt-5-chat-latest", 
+  "gpt-4o",
+];
+const SUPPORTED_ANTHROPIC_MODELS = [
+  "claude-opus-4-5-20251101", 
+  "claude-sonnet-4-5-20250929", 
+  "claude-haiku-4-5-20251001", 
+  "claude-opus-4-1-20250805",
+];
+
+export const generateCouncilMemberResponse = ({
+  messageArray,
   previousAgentResponses = undefined,
+  councilMemberConfig,
 }: {
   messageArray: BaseMessageType[];
   previousAgentResponses?: Array<{
     personaName: string;
     message: string
   }>;
+  councilMemberConfig: Partial<CouncilMember>;
 }) => (
-  Langchain.LangGraph.Task({ name: "Call Solitary Aphoristic Nomad" },
+  Langchain.LangGraph.Task({ name: `Call ${councilMemberConfig?.name || ""}` },
     async (messages: BaseMessageType[]) => {
-      const model = new Langchain.Anthropic.ChatAnthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY,
-        model: "claude-3-5-haiku-latest",
-      });
+      let model;
+
+      if (SUPPORTED_OPENAI_MODELS.includes(councilMemberConfig?.baseModel || "")) {
+        model = new Langchain.OpenAI.ChatOpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: councilMemberConfig?.baseModel,
+        });
+      } else if (SUPPORTED_ANTHROPIC_MODELS.includes(councilMemberConfig?.baseModel || "")) {
+        model = new Langchain.Anthropic.ChatAnthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY,
+          model: councilMemberConfig?.baseModel,
+        });
+      } else {
+        throw new NestError(`Unsupported model: ${councilMemberConfig?.baseModel}`, SERVER_RESPONSE_CODES.BAD_REQUEST);
+      }
+      
       interface Tool {
         invoke: (toolCall: ToolCallType) => Promise<any>;
       }
@@ -48,15 +66,15 @@ export const SolitaryAphoristicNomad = ({
           explain complex concepts. Only respond to the most recent message in the conversation and use
           the other messages as context.
 
+          ${councilMemberConfig?.basePersona || ""}
           
-
           You are a part of a larger council that has other agents with differing "personas". You may
           agree or disagree with any of the agents that respond before you based on previous interaction history
           or their current answers. However, everything should be done for the benefit of the user. Focus on 
-          being brief and concise while ever so often allowing for a longer response, no more than 500 tokens.
+          being brief and concise while ever so often allowing for a longer response, no more than 500 characters.
           When present, you should always take the answers of other Agents into consideration when responding.
           You should reference other Agents by "Agent Name".
-          
+            
           ${previousAgentResponses?.length ? `Here are the responses of agents who were selected to respond before you:
             ${previousAgentResponses.map((responseObject) => `
               Agent Persona: ${responseObject.personaName} - Agent Message: ${responseObject.message}
@@ -67,7 +85,7 @@ export const SolitaryAphoristicNomad = ({
           ${messages.map((msg) => `${msg.getType()} ${msg.content}`).join("\n")}
         `,
       }, queryMessage]);
-      
+
       let formattedReponse = "";
 
       for await (const chunk of response) {

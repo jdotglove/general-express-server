@@ -17,7 +17,8 @@ const saltRounds = parseInt(`${process.env.SALT_ROUNDS}`);
  * @member body.password - Message to use for access to knowledge
  */
 export const adminLogin = async (req: Request, res: Response) => {
-  let payload, statusCode;
+  let payload;
+  let statusCode: number;
   try {
     if (!req.body.username || !req.body.password) {
       throw new NestError("Username and password are required", SERVER_RESPONSE_CODES.BAD_REQUEST);
@@ -26,10 +27,10 @@ export const adminLogin = async (req: Request, res: Response) => {
     const foundUser = await findOneUser({
       username: req.body.username,
     });
-    
+
     const bcryptMatch = await bcrypt.compare(req.body.password, foundUser?.password);
     const createdAtDate = dayjs();
-  
+
     if (foundUser && bcryptMatch) {
       const token = jwt.sign({
         createdAt: createdAtDate,
@@ -54,20 +55,18 @@ export const adminLogin = async (req: Request, res: Response) => {
     } else {
       throw new NestError("Either password or username is incorrect", SERVER_RESPONSE_CODES.NOT_FOUND);
     }
-  } catch (error: any) {
-    const errorObj = error.response ? {
-      status: error.response.status,
-      message: error.response.statusText || error.message,
-    } : {
-      status: error.statusCode || SERVER_RESPONSE_CODES.SERVER_ERROR,
-      message: error.message,
+  } catch (error: unknown) {
+    const { message: errMessage } = error as Error;
+    const errorObj = {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: errMessage,
     };
     statusCode = errorObj.status;
     payload = { message: "Error logging in admin!" };
     console.error(`Error logging in admin: ${JSON.stringify(errorObj)}`);
-  } finally {
-    res.status(statusCode).send(payload).end();
   }
+
+  res.status(statusCode).send(payload).end();
 }
 
 /**
@@ -77,7 +76,8 @@ export const adminLogin = async (req: Request, res: Response) => {
  * @member body.password - Message to use for access to knowledge
  */
 export const createAdmin = async (req: Request, res: Response) => {
-  let payload, statusCode;
+  let payload;
+  let statusCode: number;
   try {
     if (!req.body.username || !req.body.password) {
       throw new NestError("Username and password are required", SERVER_RESPONSE_CODES.BAD_REQUEST);
@@ -98,19 +98,17 @@ export const createAdmin = async (req: Request, res: Response) => {
     payload = {
       success: true,
     }
-    
-  } catch (error: any) {
-    const errorObj = error.response ? {
-      status: error.response.status,
-      message: error.response.statusText || error.message,
-    } : {
-      status: error.statusCode || SERVER_RESPONSE_CODES.SERVER_ERROR,
-      message: error.message,
+
+  } catch (error: unknown) {
+    const { message: errMessage } = error as Error;
+    const errorObj = {
+      status: SERVER_RESPONSE_CODES.SERVER_ERROR,
+      message: errMessage,
     };
     statusCode = errorObj.status;
     payload = { message: "Error creating admin account!" };
     console.error(`Error creating admin: ${JSON.stringify(errorObj)}`);
-  } finally {
-    res.status(statusCode).send(payload).end();
   }
+
+  res.status(statusCode).send(payload).end();
 }

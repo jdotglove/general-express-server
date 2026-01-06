@@ -30,7 +30,7 @@ export const handleMessageStreaming = async (req: Request, res: Response) => {
     res.write(JSON.stringify({ "data": { 
       "type": "status", 
       "status": "connected", 
-      "timestamp": `${Date.now()}`,
+      "timestamp": `${new Date()}`,
     }}) + "\n");
 
     await createMessage({ 
@@ -59,18 +59,22 @@ export const handleMessageStreaming = async (req: Request, res: Response) => {
         "message": agentPersonaResponse.message,
         "personaName": agentPersonaResponse.personaName,
         "conversationId": `${conversationId}`, 
-        "timestamp": `${Date.now()}`,
+        "timestamp": `${new Date()}`,
       }}) + "\n");
     });
     
     res.write(JSON.stringify({ "data": { 
       "type": "status", 
       "status": "completed", 
-      "timestamp": `${Date.now()}`,
+      "timestamp": `${new Date()}`,
     }}));
     res.end();
   } catch (error) {
     console.error(`Message processing error: ${error}`);
-    res.status(500).json({ error: "Message processing failed" }).end();
+    if (error instanceof Error) {
+      res.destroy(error).end();
+    } else {
+      res.destroy(new Error(String(error))).end();
+    }
   }
 }

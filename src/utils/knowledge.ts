@@ -1,7 +1,7 @@
-import { PERSONA_MAPPING } from "./constants";
+import { CouncilMember } from "db/nest/services/council-member";
 
-export function checkIfValidOrchestrationResponse(orchestrationResponse: string) {
-  const personaKeys = Object.keys(PERSONA_MAPPING);
+export function checkIfValidOrchestrationResponse(orchestrationResponse: string, mappingValidationObject: Record<string, Partial<CouncilMember>>): boolean {
+  const personaKeys = Object.keys(mappingValidationObject);
   if (
     (orchestrationResponse.startsWith("[") && orchestrationResponse.endsWith("]"))
     && Array.isArray(orchestrationResponse)

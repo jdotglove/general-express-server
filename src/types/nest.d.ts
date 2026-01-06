@@ -8,4 +8,11 @@ declare namespace Nest {
     interface OrchestrationResponse {
         [personaKey: string]: PersonaMetadata
     }
+
+    interface AgentResponse {
+        personaName: string;
+        message: string;
+        personaModel: string;
+    }
+    
 }

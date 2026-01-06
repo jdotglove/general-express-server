@@ -18,7 +18,6 @@ export const getInventoryItems = async (req: Request, res: Response) => {
       },
     });
 
-    console.log(inventoryResopnse.data);
     const inventoryItems = inventoryResopnse.data.data.map((inventoryItem: any) => {
       return {
         squaraeProductUID: inventoryItem.product_uid,

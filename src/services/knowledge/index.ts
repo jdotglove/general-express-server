@@ -15,9 +15,7 @@ export const knowledgeBot = async (message: string, conversationId: string): Pro
   personaName: string;
 }>> => {
   try {
-    const knowledgeComposition = await knowledgeComposer(message, conversationId);
-
-    return knowledgeComposition;
+    return knowledgeComposer(message, conversationId);
   } catch (error: unknown) {
     throw new NestError(`Error using knowledge bot: ${error}`, SERVER_RESPONSE_CODES.SERVER_ERROR);
   }

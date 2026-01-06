@@ -1,23 +1,23 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-import { ChatAnthropic } from "@langchain/anthropic";
-import { entrypoint, addMessages, getPreviousState } from "@langchain/langgraph";
-import { MemorySaver } from "@langchain/langgraph";
-import { AIMessage, type BaseMessage, HumanMessage, } from "@langchain/core/messages";
 
+import Langchain, { BaseMessageType } from "../../plugins/langchain";
 import { NestError, SERVER_RESPONSE_CODES } from "../../utils/errors";
 import { createMessage } from "../../db/nest/services/message";
 import { findOneConversation, updateOneConversation } from "../../db/nest/services/conversation";
 import { createOrchestrationEvent } from "../../db/nest/services/orchestration-event";
-import { PERSONA_MAPPING } from "../../utils/constants";
-import { checkIfValidOrchestrationResponse } from "../../utils/knowledge";
 
-const checkpointer = new MemorySaver();
-const orchestrationModel = new ChatAnthropic({
+import { checkIfValidOrchestrationResponse } from "../../utils/knowledge";
+import { CouncilMember, findManyCouncilMembers } from "../../db/nest/services/council-member";
+import { generateCouncilMemberResponse } from "./generator";
+
+const checkpointer = new Langchain.LangGraph.MemorySaver();
+const orchestrationModel = new Langchain.Anthropic.ChatAnthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-  model: "claude-opus-4-20250514",
+  model: "claude-opus-4-5-20251101",
 });
 const MAX_ORCHESTRATION_RETRIES = 3;
+let PERSONA_ATTRIBUTE_MAPPING: Record<string, Partial<CouncilMember>> = {};
 
 const knowledgeComposer = async (message: string, conversationId: string): Promise<Array<{
   message: string;
@@ -28,23 +28,20 @@ const knowledgeComposer = async (message: string, conversationId: string): Promi
   }
 
   const parsedOrchestrationArray = await generateOrchestrationResponse(message, conversationId);
+  const agentResponseArray: Array<Nest.AgentResponse> = [];
 
-  const agentResponseArray: Array<{
-    personaName: string;
-    message: string;
-    personaModel: string;
-  }> = [];
   for (let i = 0; i < parsedOrchestrationArray.length; i++) {
     const agentResponse = await runAgentTaskAndInvokeResponse({
       persona: parsedOrchestrationArray[i],
       message,
       conversationId,
+      previousAgentResponses: agentResponseArray,
     });
 
     agentResponseArray.push({
-      personaName: PERSONA_MAPPING[parsedOrchestrationArray[i]].name,
+      personaName: PERSONA_ATTRIBUTE_MAPPING[parsedOrchestrationArray[i]]?.name || "",
       message: agentResponse[agentResponse.length - 1].text,
-      personaModel: PERSONA_MAPPING[parsedOrchestrationArray[i]].model,
+      personaModel: PERSONA_ATTRIBUTE_MAPPING[parsedOrchestrationArray[i]].baseModel || "",
     });
   }
 
@@ -73,30 +70,54 @@ const generateOrchestrationResponse = async (message: string, conversationId: st
   let isValidOrchestrationResponse = false
   let orchestrationResponse = "";
 
+  const foundCouncilMembers = await findManyCouncilMembers({
+    conversation: new mongoose.Types.ObjectId(conversationId),
+    active: true,
+  });
+
+  let personaMapping = "[";
+  let availableBotString = "";
+
+  foundCouncilMembers.forEach((member, index) => {
+    const personaKey = member?.name.toLowerCase().replace(/ /g, "-");
+    PERSONA_ATTRIBUTE_MAPPING[personaKey] = {
+      baseModel: member.baseModel,
+      name: member?.name,
+      basePersona: member.basePersona
+    };
+    availableBotString += `${member?.name}`;
+    if (personaKey) {
+      personaMapping += `"${personaKey}"`;
+      if (index < foundCouncilMembers.length - 1) {
+        personaMapping += ", ";
+        availableBotString += ", ";
+      } else {
+        availableBotString += ", and" ;
+      }
+    }
+  });
+  personaMapping += "]";
+
   while (!isValidOrchestrationResponse && retries < MAX_ORCHESTRATION_RETRIES) {
     const stream = await orchestrationModel.stream([{
       role: "system",
       content: `
-        ${PERSONA_MAPPING}
+        ${PERSONA_ATTRIBUTE_MAPPING}
   
         You are an orchestration bot whose purpose is to determine which bot is best suited to respond to a user's query
-        and rank the bots based on which tags of the orchestration mappings most align with what the user's query entails.
-        The three bots are 'Solitary Aphoristic Nomad Bot', 'Konigsberg Dreamer Bot', or 'Existential Lens Bot'. 
-        Only respond with an array that includes the shorthand name of the bot: 'aphoristic-nomad', 'konigsberg-dreamer', 
-        or 'existential-lens'.
+        and rank the bots based on which base persona of the orchestration mappings most align with what the user's query 
+        entails. The available bots are ${availableBotString}. Only respond with an array that includes the shorthand 
+        name of the bot: ${availableBotString}.
   
-        Example reponses are as follows: 
-        <>["konigsberg-dreamer", "aphoristic-nomad", "existential-lens"]</>
-        <>["aphoristic-nomad", "existential-lens", "konigsberg-dreamer"]</>
-        <>["existential-lens", "konigsberg-dreamer", "aphoristic-nomad"]</>
-        <>["konigsberg-dreamer", "existential-lens", "aphoristic-nomad"]</>
-        <>["aphoristic-nomad", "konigsberg-dreamer", "existential-lens"]</>
-        <>["existential-lens", "aphoristic-nomad", "konigsberg-dreamer"]</>
-            
-        If you are unsure use: 
-        <>["aphoristic-nomad", "existential-lens", "konigsberg-dreamer"]</>
+        It should following the format:
+        ["persona-key-1", "persona-key-2", "persona-key-3"]
   
-        Only respond with the ranking as a string and nothing else.
+        Where persona-key is the key that corresponds to the persona mapping provided. The order of the array should
+        reflect the ranking of which bot is best suited to respond to the user's query, with the first element being the
+        You can use any permuatation of the following persona key array: 
+        <>${personaMapping}</>
+  
+        Only respond with the ranking array and nothing else.
       `,
     }, {
       role: "user",
@@ -107,7 +128,7 @@ const generateOrchestrationResponse = async (message: string, conversationId: st
       orchestrationResponse += chunk.content;
     }
 
-    isValidOrchestrationResponse = checkIfValidOrchestrationResponse(orchestrationResponse);
+    isValidOrchestrationResponse = checkIfValidOrchestrationResponse(orchestrationResponse, PERSONA_ATTRIBUTE_MAPPING);
 
     if (!isValidOrchestrationResponse) {
       retries += 1;
@@ -116,11 +137,10 @@ const generateOrchestrationResponse = async (message: string, conversationId: st
         _id: new mongoose.Types.ObjectId(conversationId),
       });
 
-      console.log("Orchestration Response: ", orchestrationResponse);
       await createOrchestrationEvent({
         conversation: new mongoose.Types.ObjectId(conversationId),
         personaRanking: orchestrationResponse,
-        personaMappingSnapshot: JSON.stringify(PERSONA_MAPPING),
+        personaMappingSnapshot: JSON.stringify(PERSONA_ATTRIBUTE_MAPPING),
         user: foundConversation.user,
         createdAt: new Date(),
         triggerMessage: message,
@@ -128,8 +148,8 @@ const generateOrchestrationResponse = async (message: string, conversationId: st
     }
   }
 
-  if (!checkIfValidOrchestrationResponse(orchestrationResponse)) {
-    orchestrationResponse = `["aphoristic-nomad", "existential-lens", "konigsberg-dreamer"]`;
+  if (!checkIfValidOrchestrationResponse(orchestrationResponse, PERSONA_ATTRIBUTE_MAPPING)) {
+    orchestrationResponse = `${personaMapping}`;
   }
 
   return JSON.parse(orchestrationResponse);
@@ -139,20 +159,29 @@ const runAgentTaskAndInvokeResponse = async ({
   persona,
   message,
   conversationId,
+  previousAgentResponses,
 }: {
   persona: keyof Nest.OrchestrationResponse;
   message: string;
   conversationId: string;
+  previousAgentResponses: Array<Nest.AgentResponse>;
 }) => {
-  const agentTaskRunner = entrypoint({ name: "agent", checkpointer }, async (messages: BaseMessage[]) => {
-    const previous = getPreviousState<BaseMessage[]>() ?? [];
-    const modelResponse = await PERSONA_MAPPING[persona].bot([...previous, ...messages]);
-    messages = addMessages(messages, [new AIMessage(modelResponse)]);
+  const agentTaskRunner = Langchain.LangGraph.Entrypoint({
+    name: "agent",
+    checkpointer
+  }, async (messages: BaseMessageType[]) => {
+    const previous = Langchain.LangGraph.GetPreviousState<BaseMessageType[]>() ?? [];
+    const modelResponse = await generateCouncilMemberResponse({
+      messageArray: [...previous, ...messages], 
+      previousAgentResponses,
+      councilMemberConfig: PERSONA_ATTRIBUTE_MAPPING[persona],
+    });
+    messages = Langchain.LangGraph.AddMessages(messages, [new Langchain.Core.AIMessage(modelResponse)]);
     return messages;
   });
 
   return await agentTaskRunner.invoke(
-    [new HumanMessage(message)],
+    [new Langchain.Core.HumanMessage(message)],
     { configurable: { thread_id: conversationId } },
   );
 }
