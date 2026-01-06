@@ -178,7 +178,7 @@ export const updateCouncilMembers = async (req: Request, res: Response) => {
         baseModel: member.baseModel,
         basePersona: member.basePersona,
         active: member.active,
-      });
+      }, { upsert: true });
     });
     
     payload = {

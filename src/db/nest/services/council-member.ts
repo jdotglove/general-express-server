@@ -32,9 +32,11 @@ export const findManyCouncilMembers = (
 export const updateOneCouncilMember = (
   query: any,
   update: any,
+  options?: any,
 ): Promise<void> => CouncilMemberModel.updateOne(
   query,
   update,
+  options,
 ) as unknown as Promise<void>;
 
 export const updateManyCouncilMembers = (
