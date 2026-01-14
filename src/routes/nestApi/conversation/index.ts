@@ -1,7 +1,6 @@
 import express from "../../../plugins/express";
 
 import {
-    getAllConversations,
     createNewConversation,
     getConversationMessages,
     getCouncilMembers,
@@ -10,7 +9,6 @@ import {
 
 const router = express.Router();
 
-router.get("/conversation", getAllConversations);
 router.get("/conversation/:conversationId/messages", getConversationMessages);
 router.get("/conversation/:conversationId/council", getCouncilMembers);
 
