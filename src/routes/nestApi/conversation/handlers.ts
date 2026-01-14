@@ -2,40 +2,11 @@ import "dotenv/config";
 import mongoose from "mongoose";
 
 import { Request, Response } from "../../../plugins/express";
-import { findManyConversations, createConversation } from "../../../db/nest/services/conversation";
+import { createConversation } from "../../../db/nest/services/conversation";
 import { findOneUser } from "../../../db/nest/services/user";
 import { NestError, SERVER_RESPONSE_CODES } from "../../../utils/errors";
 import { findManyMessages } from "../../../db/nest/services/message";
 import { createCouncilMember, findManyCouncilMembers, updateOneCouncilMember } from "../../../db/nest/services/council-member";
-
-/**
- * @function getAllConversations
- * @param req
- */
-export const getAllConversations = async (req: Request, res: Response) => {
-  let payload, statusCode;
-  try {
-    const foundConversations = await findManyConversations({
-      username: req.body.username,
-    });
-
-    payload = { success: true, conversations: foundConversations };
-    statusCode = SERVER_RESPONSE_CODES.ACCEPTED;
-  } catch (error: any) {
-    const errorObj = error.response ? {
-      status: error.response.status,
-      message: error.response.statusText || error.message,
-    } : {
-      status: error.statusCode || SERVER_RESPONSE_CODES.SERVER_ERROR,
-      message: error.message,
-    };
-    statusCode = errorObj.status;
-    payload = { message: "Error getting all conversations!" };
-    console.error(`Error getting all conversations: ${JSON.stringify(errorObj)}`);
-  } finally {
-    res.status(statusCode).send(payload).end();
-  }
-}
 
 /**
  * @function createNewConversation
@@ -178,7 +149,7 @@ export const updateCouncilMembers = async (req: Request, res: Response) => {
         baseModel: member.baseModel,
         basePersona: member.basePersona,
         active: member.active,
-      });
+      }, { upsert: true });
     });
     
     payload = {

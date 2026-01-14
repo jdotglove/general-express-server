@@ -31,7 +31,9 @@ export const findManyConversations = (
 export const updateOneConversation = (
   query: any,
   update: any,
+  options?: any,
 ): Promise<void> => ConversationModel.updateOne(
   query,
   update,
+  options,
 ) as unknown as Promise<void>;

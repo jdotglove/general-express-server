@@ -31,7 +31,9 @@ export const findOneSessionAndUpdate = (
 export const updateOneSession = (
   query: any,
   update: any,
+  options?: any,
 ): Promise<void> => SessionModel.updateOne(
   query,
   update,
+  options,
 ) as unknown as Promise<void>;
