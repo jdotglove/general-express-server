@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 
 import { Request, Response } from "../../../plugins/express";
 import { NestError, SERVER_RESPONSE_CODES } from "../../../utils/errors";
-import { createUser, findOneUser } from "../../../db/nest/services/user";
+import { createUser, findOneUser, User } from "../../../db/nest/services/user";
 import { createSession } from "../../../db/nest/services/session";
 
 const saltRounds = parseInt(`${process.env.SALT_ROUNDS}`);
@@ -82,23 +82,44 @@ export const createAdmin = async (req: Request, res: Response) => {
     if (!req.body.username || !req.body.password) {
       throw new NestError("Username and password are required", SERVER_RESPONSE_CODES.BAD_REQUEST);
     }
-
-    const createdAtDate = new Date();
+    let createdUser: User;
+    const createdAtDate = dayjs();
     if (typeof saltRounds === "number") {
-      bcrypt.hash(req.body.password, saltRounds).then(async function (hash) {
-        await createUser({
-          username: req.body.username,
-          password: hash,
-          createdAt: new Date(createdAtDate),
-        });
+      const hash = await bcrypt.hash(req.body.password, saltRounds)
+
+      createdUser = await createUser({
+        username: req.body.username,
+        password: hash,
+        createdAt: createdAtDate.toDate(),
       });
-    }
 
-    statusCode = SERVER_RESPONSE_CODES.ACCEPTED;
-    payload = {
-      success: true,
+      if (createdUser) {
+        const token = jwt.sign({
+          createdAt: createdAtDate,
+          userId: createdUser._id,
+        }, `${process.env.JWT_SECRET_KEY}`, {
+          expiresIn: "2 hours",
+        });
+  
+        const newUserSession = await createSession({
+          createdAt: createdAtDate.toDate(),
+          expiresAt: createdAtDate.add(300, "hour").toDate(),
+          token,
+          updatedAt: createdAtDate.toDate(),
+          user: createdUser._id,
+        });
+  
+        statusCode = SERVER_RESPONSE_CODES.ACCEPTED;
+        payload = {
+          success: true,
+          session: newUserSession,
+        }
+      } else {
+        throw new NestError("Error creating admin user", SERVER_RESPONSE_CODES.SERVER_ERROR);
+      }
+    } else {
+      throw new NestError("Salt rounds is not a number", SERVER_RESPONSE_CODES.SERVER_ERROR);
     }
-
   } catch (error: unknown) {
     const { message: errMessage } = error as Error;
     const errorObj = {
